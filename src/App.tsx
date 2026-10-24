@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { LiveBackground } from './components/LiveBackground';
 import { Hero } from './components/Hero';
@@ -12,6 +12,7 @@ import { CertificationsSection } from './components/CertificationsSection';
 import { HseSection } from './components/HseSection';
 import { Footer } from './components/Footer';
 import { QuoteModal } from './components/QuoteModal';
+import { AdminModal } from './components/AdminModal';
 import { Box } from 'lucide-react';
 
 export default function App() {
@@ -21,6 +22,21 @@ export default function App() {
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [quoteDivision, setQuoteDivision] = useState('Renewable Energy & Solar EPC');
   const [quoteNotes, setQuoteNotes] = useState('');
+
+  // Admin portal state
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  useEffect(() => {
+    // Listen for #admin in the URL hash to immediately open the admin portal
+    const checkHash = () => {
+      if (window.location.hash === '#admin') {
+        setIsAdminOpen(true);
+      }
+    };
+    checkHash();
+    window.addEventListener('hashchange', checkHash);
+    return () => window.removeEventListener('hashchange', checkHash);
+  }, []);
 
   const handleOpenQuoteModal = (division?: string) => {
     if (division) setQuoteDivision(division);
@@ -156,7 +172,10 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer onOpenQuoteModal={() => handleOpenQuoteModal()} />
+      <Footer
+        onOpenQuoteModal={() => handleOpenQuoteModal()}
+        onOpenAdminModal={() => setIsAdminOpen(true)}
+      />
 
       {/* Project RFP / EPC Quote Modal */}
       <QuoteModal
@@ -164,6 +183,17 @@ export default function App() {
         onClose={() => setIsQuoteOpen(false)}
         initialDivision={quoteDivision}
         initialNotes={quoteNotes}
+      />
+
+      {/* Executive Admin & Leads Dashboard Modal */}
+      <AdminModal
+        isOpen={isAdminOpen}
+        onClose={() => {
+          setIsAdminOpen(false);
+          if (window.location.hash === '#admin') {
+            history.pushState(null, '', window.location.pathname);
+          }
+        }}
       />
     </div>
   );

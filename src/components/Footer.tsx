@@ -1,14 +1,15 @@
 import React from 'react';
-import { Phone, Mail, MapPin, Globe, ArrowUp, Instagram } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, ArrowUp, Instagram, Lock } from 'lucide-react';
 import { ThemeMode } from '../types';
 import { Logo } from './Logo';
 
 interface FooterProps {
   theme?: ThemeMode;
   onOpenQuoteModal: () => void;
+  onOpenAdminModal?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal, onOpenAdminModal }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -176,6 +177,19 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal }) => {
             <span aria-hidden="true" className="hidden sm:inline">·</span>
             <span>MNRE Approved</span>
             <span aria-hidden="true" className="hidden sm:inline">·</span>
+            {onOpenAdminModal && (
+              <>
+                <button
+                  onClick={onOpenAdminModal}
+                  className="text-slate-500 hover:text-cyan-400 text-xs flex items-center gap-1 transition-colors group cursor-pointer"
+                  title="Executive Admin & Leads Dashboard"
+                >
+                  <Lock className="w-3 h-3 text-slate-500 group-hover:text-cyan-400" />
+                  <span>Admin Portal</span>
+                </button>
+                <span aria-hidden="true" className="hidden sm:inline">·</span>
+              </>
+            )}
             <button
               onClick={scrollToTop}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"

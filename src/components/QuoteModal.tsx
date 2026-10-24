@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle, Send, ShieldCheck, PhoneCall, Sparkles } from 'lucide-react';
+import { X, CheckCircle, Send, ShieldCheck, MessageSquare, Loader2, MailCheck } from 'lucide-react';
 import { ThemeMode } from '../types';
+import { saveLead } from '../utils/leadsManager';
+import { sendEmailNotification } from '../utils/emailService';
 
 interface QuoteModalProps {
   isOpen: boolean;
@@ -15,7 +17,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
   onClose,
   initialDivision = 'Renewable Energy & Solar EPC',
   initialNotes = '',
-  theme,
+  theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
 
@@ -29,9 +31,11 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
   const [email, setEmail] = useState('');
   const [notes, setNotes] = useState(initialNotes);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [referenceId, setReferenceId] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [emailSentStatus, setEmailSentStatus] = useState<string>('');
 
   useEffect(() => {
     if (initialDivision) setDivision(initialDivision);
@@ -40,19 +44,51 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || !phone.trim() || !email.trim()) {
       setErrorMessage('Please fill in your name, contact phone, and email address.');
       return;
     }
 
-    // Generate reference ID
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    // Generate unique reference ID
     const randomNum = Math.floor(1000 + Math.random() * 9000);
     const refCode = `PIPL-RFP-2026-${randomNum}`;
     setReferenceId(refCode);
-    setIsSubmitted(true);
-    setErrorMessage('');
+
+    // 1. Save lead into local CRM (zero lost data)
+    const newLead = saveLead({
+      id: refCode,
+      fullName: fullName.trim(),
+      company: company.trim() || undefined,
+      phone: phone.trim(),
+      email: email.trim(),
+      division,
+      sector,
+      projectScale,
+      location,
+      notes: notes.trim() || undefined,
+      source: 'Website RFP Quote Form',
+    });
+
+    // 2. Dispatch real-time email notification to SAIELKHAROTE219@gmail.com
+    try {
+      const emailResult = await sendEmailNotification(newLead);
+      if (emailResult.success) {
+        setEmailSentStatus('Email notification dispatched to SAIELKHAROTE219@gmail.com & Pune HQ');
+      } else {
+        setEmailSentStatus('Logged into CRM database (Email queue processing)');
+      }
+    } catch (err) {
+      console.warn('Email dispatch catch:', err);
+      setEmailSentStatus('Logged into CRM database');
+    } finally {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    }
   };
 
   const handleReset = () => {
@@ -62,12 +98,28 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
     setPhone('');
     setEmail('');
     setNotes('');
+    setReferenceId('');
+    setEmailSentStatus('');
     onClose();
   };
 
+  const waLeadText = encodeURIComponent(
+    `*NEW PROJECT RFP - PIPL*\n` +
+      `*Reference:* ${referenceId}\n` +
+      `*Name:* ${fullName}\n` +
+      `*Company/Society:* ${company || 'Individual/Residential'}\n` +
+      `*Phone:* ${phone}\n` +
+      `*Email:* ${email}\n` +
+      `*Division:* ${division}\n` +
+      `*Scale:* ${projectScale}\n` +
+      `*Location:* ${location}\n` +
+      (notes ? `*Site Notes:* ${notes}\n` : '') +
+      `\nPlease review my project requirements.`
+  );
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in"
       onClick={onClose}
     >
       <div
@@ -100,35 +152,58 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
         </div>
 
         {isSubmitted ? (
-          <div className="py-8 text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
+          <div className="py-6 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30 shadow-lg shadow-emerald-500/10">
               <CheckCircle className="w-8 h-8" />
             </div>
 
-            <h4 className="text-xl font-bold text-slate-100 font-heading">
+            <h4 className="text-xl sm:text-2xl font-bold text-slate-100 font-heading">
               Proposal Request Logged Successfully
             </h4>
 
             <p className="text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
-              Thank you, <strong className="text-white">{fullName}</strong>. Your requirement has been assigned to our Senior Projects Engineering Division at our Pune HQ.
+              Thank you, <strong className="text-white">{fullName}</strong>. Your project requirement has been registered and assigned to our Senior Projects Engineering Division at Pune HQ.
             </p>
 
-            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 max-w-sm mx-auto">
-              <div className="text-xs text-slate-500">Official Tracking Reference</div>
-              <div className="text-xl font-mono font-bold text-cyan-400 mt-1 select-all">
+            {/* Reference Box */}
+            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 max-w-md mx-auto space-y-2">
+              <div className="text-xs text-slate-400 uppercase tracking-wider font-mono">
+                Official Tracking Reference
+              </div>
+              <div className="text-2xl font-mono font-bold text-cyan-400 select-all">
                 {referenceId}
               </div>
-              <div className="text-[11px] text-slate-400 mt-1">
-                A technical advisor will contact you within 4 business hours.
+              <div className="flex items-center justify-center gap-1.5 text-xs text-emerald-400 pt-1">
+                <MailCheck className="w-4 h-4 shrink-0" />
+                <span>{emailSentStatus || 'Email notification sent to SAIELKHAROTE219@gmail.com'}</span>
+              </div>
+              <div className="text-[11px] text-slate-400">
+                A technical engineer will contact you within 4 business hours.
               </div>
             </div>
 
-            <div className="pt-4 flex justify-center">
+            {/* Instant WhatsApp Forwarding Option */}
+            <div className="pt-2 max-w-md mx-auto space-y-3">
+              <div className="text-xs text-slate-400 font-medium">
+                Want immediate priority review? Forward this directly to our desk on WhatsApp:
+              </div>
+              <a
+                href={`https://wa.me/917666121210?text=${waLeadText}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Forward via WhatsApp (+91 76661 21210)</span>
+              </a>
+            </div>
+
+            <div className="pt-3 flex justify-center">
               <button
                 onClick={handleReset}
-                className="px-6 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-semibold text-xs hover:bg-cyan-400 transition-colors"
+                className="px-6 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition-colors"
               >
-                Done
+                Close & Return
               </button>
             </div>
           </div>
@@ -290,23 +365,34 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
             <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-xs text-slate-400">
                 <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
-                <span>NDA & Statutory Privacy Guaranteed</span>
+                <span>NDA Protected & Instant Notification to Pune Desk</span>
               </div>
 
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={onClose}
+                  disabled={isSubmitting}
                   className="px-4 py-2.5 rounded-xl border border-slate-800 text-xs text-slate-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-cyan-500/20"
+                  disabled={isSubmitting}
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-cyan-500/20 disabled:opacity-50"
                 >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Submit RFP Request</span>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Dispatching RFP...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Submit RFP Request</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
