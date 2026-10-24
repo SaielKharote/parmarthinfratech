@@ -123,3 +123,26 @@
     opacity: 0.2 !important;
   }
 }
+
+/* Continuous Moving Train Track Marquee for Accomplishments */
+@keyframes trainMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-train-track {
+  display: flex;
+  width: max-content;
+  animation: trainMarquee 38s linear infinite;
+  will-change: transform;
+}
+
+.animate-train-track:hover,
+.animate-train-track.paused {
+  animation-play-state: paused;
+}
+

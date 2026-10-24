@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { LiveBackground } from './components/LiveBackground';
 import { Hero } from './components/Hero';
+import { ProjectsSlider } from './components/ProjectsSlider';
 import { OrganizationSection } from './components/OrganizationSection';
 import { ServicesSection } from './components/ServicesSection';
 import { ProjectsSection } from './components/ProjectsSection';
@@ -63,6 +64,14 @@ export default function App() {
         <Hero
           onSelectModel={setSelected3DModel}
           onOpenQuoteModal={handleOpenQuoteModal}
+        />
+
+        {/* 1.5 Auto-Moving Accomplishments Slider for Notable Execution Projects */}
+        <ProjectsSlider
+          onSelectProjectForRFP={(project) => {
+            setQuoteNotes(`Inquiry regarding project scope & execution similar to: ${project}`);
+            setIsQuoteOpen(true);
+          }}
         />
 
         {/* 2. Organization Structure & 3 Core Divisions (Civil, Electrical, Renewable) */}
