@@ -14,7 +14,7 @@ import {
 import { ThemeMode } from '../types';
 
 interface InstagramSectionProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
 }
 
 interface PostItem {

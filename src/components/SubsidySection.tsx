@@ -3,7 +3,7 @@ import { CheckCircle2, Phone } from 'lucide-react';
 import { ThemeMode } from '../types';
 
 interface SubsidySectionProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
   onOpenQuoteModal: (division?: string) => void;
 }
 

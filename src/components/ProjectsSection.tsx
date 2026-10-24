@@ -3,7 +3,7 @@ import { ProjectItem, ThemeMode } from '../types';
 import { Building2, Zap, Sun, Droplets, Filter, CheckCircle2, MapPin, IndianRupee } from 'lucide-react';
 
 interface ProjectsSectionProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
   onSelectProjectForRFP: (projectTitle: string) => void;
 }
 

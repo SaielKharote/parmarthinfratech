@@ -4,7 +4,7 @@ import { ThemeMode } from '../types';
 import { Logo } from './Logo';
 
 interface FooterProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
   onOpenQuoteModal: () => void;
 }
 

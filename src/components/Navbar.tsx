@@ -1,39 +1,23 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Menu, X, Phone, Instagram } from 'lucide-react';
-import { BackgroundStyle, ThemeMode } from '../types';
+import { Menu, X, Phone, Instagram } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface NavbarProps {
-  theme: ThemeMode;
-  onToggleTheme: () => void;
-  backgroundStyle: BackgroundStyle;
-  onChangeBackgroundStyle: (style: BackgroundStyle) => void;
   onOpenQuoteModal: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  theme,
-  onToggleTheme,
-  onOpenQuoteModal,
-}) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isDark = theme === 'dark';
 
   return (
-    <header
-      className={`sticky top-0 z-40 w-full transition-colors duration-200 border-b backdrop-blur-md ${
-        isDark
-          ? 'bg-slate-950/90 border-slate-800 text-slate-100'
-          : 'bg-white/95 border-slate-200 text-slate-900 shadow-sm'
-      }`}
-    >
+    <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-slate-950/90 border-slate-800 text-slate-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-3 sm:gap-6">
         {/* Zone 1: Authentic Brand Logo */}
         <a href="#" className="flex items-center gap-2 sm:gap-3 whitespace-nowrap shrink-0 focus:outline-none">
           <Logo showText={true} />
         </a>
 
-        {/* Zone 2: Simple & Clear Navigation Links */}
+        {/* Zone 2: Navigation Links */}
         <nav className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-medium">
           <a
             href="#subsidy"
@@ -74,14 +58,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           </a>
         </nav>
 
-        {/* Zone 3: Direct Actions + Theme Toggle + Quote CTA */}
+        {/* Zone 3: Direct Actions & Quote CTA */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Instagram quick icon */}
+          {/* Instagram quick link */}
           <a
             href="https://www.instagram.com/parmaarthinfratechpvt/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden xl:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors"
+            className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors"
             title="Follow @parmaarthinfratechpvt on Instagram"
           >
             <Instagram className="w-3.5 h-3.5" />
@@ -100,23 +84,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>WhatsApp</span>
           </a>
 
-          {/* Theme Mode Toggle */}
-          <button
-            onClick={onToggleTheme}
-            className={`p-1.5 sm:p-2 rounded-lg border transition-colors ${
-              isDark
-                ? 'bg-slate-900 border-slate-700 text-amber-400 hover:text-amber-300'
-                : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
-            }`}
-            aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-
           {/* Primary Action Button */}
           <button
             onClick={onOpenQuoteModal}
-            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors shadow-sm whitespace-nowrap shrink-0"
+            className="px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors shadow-sm whitespace-nowrap shrink-0"
           >
             <span className="hidden sm:inline">Get Free </span>Quote
           </button>

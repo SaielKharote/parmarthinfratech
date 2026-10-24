@@ -14,7 +14,7 @@ import {
 import { ThemeMode } from '../types';
 
 interface ServicesSectionProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
   onSelectModel: (model: 'solar' | 'meter' | 'transformer' | 'ev') => void;
   onOpenQuoteModal: (division?: string) => void;
 }

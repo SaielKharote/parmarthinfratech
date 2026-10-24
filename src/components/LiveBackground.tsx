@@ -1,84 +1,14 @@
 import React, { useEffect, useRef } from 'react';
-import { BackgroundStyle, ThemeMode } from '../types';
-
-interface LiveBackgroundProps {
-  style?: BackgroundStyle;
-  theme?: ThemeMode;
-  interactive?: boolean;
-}
 
 /**
- * High-performance, silky-smooth ambient background.
- * Uses GPU-accelerated CSS transforms and lightweight canvas particles without heavy 3D geometries
- * or O(N^2) loops that previously caused mobile lag, sticky scrolling, and visual clutter.
+ * Dynamic Wallpaper:
+ * Sleek, simple, and slow-motion ambient background for the complete screen.
+ * Operates purely on slow-motion GPU-accelerated atmospheric gradients and
+ * tranquil floating solar photon particles without any mouse/gyro tilt listeners.
  */
-export const LiveBackground: React.FC<LiveBackgroundProps> = ({
-  style = 'grid',
-  theme = 'dark',
-  interactive = true,
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+export const LiveBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const isDark = theme === 'dark';
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container || !interactive) return;
-
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let rafId: number;
-
-    // Smooth lerp loop using CSS variables on the container to avoid React re-renders
-    const updateMotion = () => {
-      currentX += (targetX - currentX) * 0.06;
-      currentY += (targetY - currentY) * 0.06;
-
-      container.style.setProperty('--tilt-x', `${currentX.toFixed(3)}px`);
-      container.style.setProperty('--tilt-y', `${currentY.toFixed(3)}px`);
-
-      rafId = requestAnimationFrame(updateMotion);
-    };
-
-    rafId = requestAnimationFrame(updateMotion);
-
-    // Desktop Mouse Parallax
-    const handlePointerMove = (e: PointerEvent) => {
-      // Normalize from -15px to 15px
-      const nx = ((e.clientX / window.innerWidth) - 0.5) * 30;
-      const ny = ((e.clientY / window.innerHeight) - 0.5) * 30;
-      targetX = nx;
-      targetY = ny;
-    };
-
-    // Mobile Device Orientation (Gyroscope) Parallax
-    const handleDeviceOrientation = (e: DeviceOrientationEvent) => {
-      if (e.gamma !== null && e.beta !== null) {
-        // gamma: left-to-right [-90, 90], beta: front-to-back [-180, 180]
-        const gx = Math.max(-15, Math.min(15, (e.gamma / 30) * 15));
-        const gy = Math.max(-15, Math.min(15, ((e.beta - 45) / 35) * 15));
-        targetX = gx;
-        targetY = gy;
-      }
-    };
-
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
-      window.addEventListener('deviceorientation', handleDeviceOrientation, { passive: true });
-    }
-
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      if (typeof window !== 'undefined' && 'DeviceOrientationEvent' in window) {
-        window.removeEventListener('deviceorientation', handleDeviceOrientation);
-      }
-      cancelAnimationFrame(rafId);
-    };
-  }, [interactive]);
-
-  // Lightweight 2D canvas for subtle solar photon particles (zero CPU overhead, runs at smooth 60fps)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -96,8 +26,8 @@ export const LiveBackground: React.FC<LiveBackgroundProps> = ({
     };
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // Modest particle count: 40 particles is more than enough for high-end elegance without lagging
-    const particleCount = 38;
+    // Modest particle count for calm, slow-motion elegance (36 peaceful solar photons)
+    const particleCount = 36;
     const particles: Array<{
       x: number;
       y: number;
@@ -105,21 +35,27 @@ export const LiveBackground: React.FC<LiveBackgroundProps> = ({
       vx: number;
       vy: number;
       alpha: number;
+      alphaSpeed: number;
       color: string;
     }> = [];
 
-    const colors = isDark
-      ? ['rgba(6, 182, 212, ', 'rgba(245, 158, 11, ', 'rgba(16, 185, 129, ']
-      : ['rgba(2, 132, 199, ', 'rgba(217, 119, 6, ', 'rgba(5, 150, 105, '];
+    const colors = [
+      'rgba(6, 182, 212, ',   // Clean Cyan
+      'rgba(245, 158, 11, ',  // Solar Amber
+      'rgba(16, 185, 129, ',  // Clean Emerald
+      'rgba(56, 189, 248, ',  // Electric Sky Blue
+    ];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
         size: Math.random() * 2 + 1,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: -Math.random() * 0.5 - 0.1, // Gently floating upwards like solar energy
-        alpha: Math.random() * 0.4 + 0.15,
+        // Ultra-slow, gentle floating speed
+        vx: (Math.random() - 0.5) * 0.12,
+        vy: -Math.random() * 0.22 - 0.08, 
+        alpha: Math.random() * 0.35 + 0.1,
+        alphaSpeed: (Math.random() * 0.004 + 0.002) * (Math.random() > 0.5 ? 1 : -1),
         color: colors[Math.floor(Math.random() * colors.length)],
       });
     }
@@ -138,7 +74,18 @@ export const LiveBackground: React.FC<LiveBackgroundProps> = ({
           const p = particles[i];
           p.x += p.vx;
           p.y += p.vy;
+          p.alpha += p.alphaSpeed;
 
+          // Pulse alpha smoothly between 0.08 and 0.45
+          if (p.alpha > 0.45) {
+            p.alpha = 0.45;
+            p.alphaSpeed = -p.alphaSpeed;
+          } else if (p.alpha < 0.08) {
+            p.alpha = 0.08;
+            p.alphaSpeed = -p.alphaSpeed;
+          }
+
+          // Wrap edges
           if (p.y < -10) {
             p.y = height + 10;
             p.x = Math.random() * width;
@@ -148,7 +95,7 @@ export const LiveBackground: React.FC<LiveBackgroundProps> = ({
 
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `${p.color}${p.alpha})`;
+          ctx.fillStyle = `${p.color}${p.alpha.toFixed(3)})`;
           ctx.fill();
         }
       }
@@ -163,72 +110,59 @@ export const LiveBackground: React.FC<LiveBackgroundProps> = ({
       document.removeEventListener('visibilitychange', handleVisibility);
       cancelAnimationFrame(animId);
     };
-  }, [isDark]);
+  }, []);
 
   return (
     <div
-      ref={containerRef}
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none -z-10 overflow-hidden select-none"
-      style={{
-        // CSS variables dynamically updated by mouse/gyro without React re-renders
-        ['--tilt-x' as any]: '0px',
-        ['--tilt-y' as any]: '0px',
-      }}
+      className="fixed inset-0 pointer-events-none -z-10 overflow-hidden select-none bg-slate-950"
     >
-      {/* 1. Deep Atmospheric Gradient */}
-      <div
-        className={`absolute inset-0 transition-colors duration-700 ${
-          isDark
-            ? 'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950'
-            : 'bg-gradient-to-b from-slate-50 via-sky-50/40 to-slate-100'
-        }`}
-      />
+      {/* 1. Deep Atmospheric Gradient Base */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-[#030917] to-slate-950" />
 
-      {/* 2. Interactive Reactive Glow Orbs (Subtle Cyan & Solar Amber) */}
+      {/* 2. Slow-Motion Auroral Ambient Gradient Spheres */}
+      {/* Cyan Clean-Tech Aura (Top Left / Center) */}
       <div
-        className="absolute -top-32 -left-32 w-96 h-96 sm:w-[500px] sm:h-[500px] rounded-full blur-3xl opacity-35 transition-transform duration-300 ease-out"
+        className="absolute -top-32 -left-28 w-[450px] h-[450px] sm:w-[650px] sm:h-[650px] rounded-full blur-[100px] opacity-35 animate-slow-drift-1"
         style={{
-          background: isDark
-            ? 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, rgba(6,182,212,0) 70%)'
-            : 'radial-gradient(circle, rgba(2,132,199,0.18) 0%, rgba(2,132,199,0) 70%)',
-          transform: 'translate3d(var(--tilt-x), var(--tilt-y), 0)',
+          background: 'radial-gradient(circle, rgba(6,182,212,0.3) 0%, rgba(6,182,212,0.08) 50%, transparent 75%)',
         }}
       />
 
+      {/* Solar Amber Energy Aura (Top Right / Middle) */}
       <div
-        className="absolute top-1/3 -right-32 w-96 h-96 sm:w-[600px] sm:h-[600px] rounded-full blur-3xl opacity-30 transition-transform duration-300 ease-out"
+        className="absolute top-1/4 -right-24 w-[420px] h-[420px] sm:w-[600px] sm:h-[600px] rounded-full blur-[110px] opacity-30 animate-slow-drift-2"
         style={{
-          background: isDark
-            ? 'radial-gradient(circle, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0) 70%)'
-            : 'radial-gradient(circle, rgba(217,119,6,0.15) 0%, rgba(217,119,6,0) 70%)',
-          transform: 'translate3d(calc(var(--tilt-x) * -1.2), calc(var(--tilt-y) * -1.2), 0)',
+          background: 'radial-gradient(circle, rgba(245,158,11,0.25) 0%, rgba(217,119,6,0.06) 55%, transparent 75%)',
         }}
       />
 
+      {/* Renewable Emerald Aura (Bottom Center) */}
       <div
-        className="absolute -bottom-32 left-1/4 w-96 h-96 sm:w-[500px] sm:h-[500px] rounded-full blur-3xl opacity-25 transition-transform duration-300 ease-out"
+        className="absolute -bottom-36 left-1/3 w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full blur-[120px] opacity-25 animate-slow-drift-3"
         style={{
-          background: isDark
-            ? 'radial-gradient(circle, rgba(16,185,129,0.16) 0%, rgba(16,185,129,0) 70%)'
-            : 'radial-gradient(circle, rgba(5,150,105,0.12) 0%, rgba(5,150,105,0) 70%)',
-          transform: 'translate3d(calc(var(--tilt-x) * 0.8), calc(var(--tilt-y) * 0.8), 0)',
+          background: 'radial-gradient(circle, rgba(16,185,129,0.22) 0%, rgba(5,150,105,0.05) 50%, transparent 75%)',
         }}
       />
 
-      {/* 3. Subtle Solar Photovoltaic Grid Pattern (Reacts subtly to motion) */}
-      {style === 'grid' && (
-        <div
-          className="absolute inset-0 opacity-[0.035] dark:opacity-[0.06] transition-transform duration-300 ease-out"
-          style={{
-            backgroundImage: `linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)`,
-            backgroundSize: '48px 48px',
-            transform: 'translate3d(calc(var(--tilt-x) * 0.4), calc(var(--tilt-y) * 0.4), 0)',
-          }}
-        />
-      )}
+      {/* Deep Cobalt Substation Aura (Center Breathing Pulse) */}
+      <div
+        className="absolute top-1/2 left-1/4 w-[380px] h-[380px] sm:w-[550px] sm:h-[550px] rounded-full blur-[90px] opacity-20 animate-slow-pulse"
+        style={{
+          background: 'radial-gradient(circle, rgba(59,130,246,0.22) 0%, rgba(30,64,175,0.05) 60%, transparent 80%)',
+        }}
+      />
 
-      {/* 4. Lightweight Solar Energy Photon Particles */}
+      {/* 3. Sleek Photovoltaic Grid Blueprint Texture */}
+      <div
+        className="absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.7) 1px, transparent 1px)`,
+          backgroundSize: '54px 54px',
+        }}
+      />
+
+      {/* 4. Fine Slow-Motion Floating Solar Energy Particles */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"

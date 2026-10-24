@@ -7,7 +7,7 @@ interface QuoteModalProps {
   onClose: () => void;
   initialDivision?: string;
   initialNotes?: string;
-  theme: ThemeMode;
+  theme?: ThemeMode;
 }
 
 export const QuoteModal: React.FC<QuoteModalProps> = ({

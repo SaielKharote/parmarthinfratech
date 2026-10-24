@@ -12,22 +12,15 @@ import { CertificationsSection } from './components/CertificationsSection';
 import { HseSection } from './components/HseSection';
 import { Footer } from './components/Footer';
 import { QuoteModal } from './components/QuoteModal';
-import { BackgroundStyle, ThemeMode } from './types';
-import { Box, Sparkles, ShieldCheck } from 'lucide-react';
+import { Box } from 'lucide-react';
 
 export default function App() {
-  const [theme, setTheme] = useState<ThemeMode>('dark');
-  const [backgroundStyle, setBackgroundStyle] = useState<BackgroundStyle>('grid');
   const [selected3DModel, setSelected3DModel] = useState<'solar' | 'meter' | 'transformer' | 'ev'>('solar');
 
   // Quote modal state
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [quoteDivision, setQuoteDivision] = useState('Renewable Energy & Solar EPC');
   const [quoteNotes, setQuoteNotes] = useState('');
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
 
   const handleOpenQuoteModal = (division?: string) => {
     if (division) setQuoteDivision(division);
@@ -39,51 +32,32 @@ export default function App() {
     setIsQuoteOpen(true);
   };
 
-  const isDark = theme === 'dark';
-
   return (
-    <div
-      className={`min-h-screen transition-colors duration-300 font-sans ${
-        isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
-      }`}
-    >
-      {/* Three.js Live Ambient Background */}
-      <LiveBackground style={backgroundStyle} theme={theme} interactive={true} />
+    <div className="min-h-screen font-sans bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+      {/* Sleek, simple, slow-motion dynamic wallpaper background */}
+      <LiveBackground />
 
       {/* Top Bar Navigation */}
-      <Navbar
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        backgroundStyle={backgroundStyle}
-        onChangeBackgroundStyle={setBackgroundStyle}
-        onOpenQuoteModal={() => handleOpenQuoteModal()}
-      />
+      <Navbar onOpenQuoteModal={() => handleOpenQuoteModal()} />
 
       {/* Main Content Sections */}
       <main>
         {/* 1. Friendly Hero Section with Pune Office & Installations */}
         <Hero
-          theme={theme}
           onSelectModel={setSelected3DModel}
           onOpenQuoteModal={() => handleOpenQuoteModal()}
         />
 
         {/* 2. Maharashtra & PM Surya Ghar Solar Subsidy Section */}
-        <SubsidySection
-          theme={theme}
-          onOpenQuoteModal={handleOpenQuoteModal}
-        />
+        <SubsidySection onOpenQuoteModal={handleOpenQuoteModal} />
 
         {/* 3. Real-Time Instagram Feed & Verified Social Integration */}
-        <InstagramSection theme={theme} />
+        <InstagramSection />
 
         {/* 4. Simple Bill Savings & ROI Calculator */}
-        <EnergyCalculator
-          theme={theme}
-          onOpenQuoteWithDetails={handleOpenQuoteWithDetails}
-        />
+        <EnergyCalculator onOpenQuoteWithDetails={handleOpenQuoteWithDetails} />
 
-        {/* 4. Interactive 3D Equipment Viewport Section */}
+        {/* 5. Interactive 3D Equipment Viewport Section */}
         <section id="3d-twin" className="py-14 md:py-24 border-t border-slate-800/80 scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 sm:gap-6 mb-6 sm:mb-8">
@@ -149,17 +123,16 @@ export default function App() {
             <ModelViewer
               key={selected3DModel}
               initialModel={selected3DModel}
-              theme={theme}
-              onExploreService={(svc) => {
+              theme="dark"
+              onExploreService={() => {
                 document.getElementById('solutions')?.scrollIntoView({ behavior: 'smooth' });
               }}
             />
           </div>
         </section>
 
-        {/* 5. Engineering Divisions Section */}
+        {/* 6. Engineering Divisions Section */}
         <ServicesSection
-          theme={theme}
           onSelectModel={(m) => {
             setSelected3DModel(m);
             document.getElementById('3d-twin')?.scrollIntoView({ behavior: 'smooth' });
@@ -167,24 +140,23 @@ export default function App() {
           onOpenQuoteModal={handleOpenQuoteModal}
         />
 
-        {/* 6. Notable Projects (PCMC, Adani, Finolex, etc.) */}
+        {/* 7. Notable Projects (PCMC, Adani, Finolex, etc.) */}
         <ProjectsSection
-          theme={theme}
           onSelectProjectForRFP={(project) => {
             setQuoteNotes(`Inquiry regarding project scope & execution similar to: ${project}`);
             setIsQuoteOpen(true);
           }}
         />
 
-        {/* 7. Certifications & Major Clients (Adani, Mahindra, L&T, etc.) */}
-        <CertificationsSection theme={theme} />
+        {/* 8. Certifications & Major Clients (Adani, Mahindra, L&T, etc.) */}
+        <CertificationsSection />
 
-        {/* 8. Safety & Equipment Rigor */}
-        <HseSection theme={theme} />
+        {/* 9. Safety & Equipment Rigor */}
+        <HseSection />
       </main>
 
       {/* Footer */}
-      <Footer theme={theme} onOpenQuoteModal={() => handleOpenQuoteModal()} />
+      <Footer onOpenQuoteModal={() => handleOpenQuoteModal()} />
 
       {/* Project RFP / EPC Quote Modal */}
       <QuoteModal
@@ -192,7 +164,6 @@ export default function App() {
         onClose={() => setIsQuoteOpen(false)}
         initialDivision={quoteDivision}
         initialNotes={quoteNotes}
-        theme={theme}
       />
     </div>
   );

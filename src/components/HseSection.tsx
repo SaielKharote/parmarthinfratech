@@ -3,7 +3,7 @@ import { Shield, HardHat, Flame, Award, Truck, ClipboardList, CheckCircle } from
 import { ThemeMode } from '../types';
 
 interface HseSectionProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
 }
 
 export const HseSection: React.FC<HseSectionProps> = ({ theme }) => {

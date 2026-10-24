@@ -3,7 +3,7 @@ import { ShieldCheck, Award, FileCheck, CheckCircle, ExternalLink } from 'lucide
 import { ThemeMode } from '../types';
 
 interface CertificationsSectionProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
 }
 
 export const CertificationsSection: React.FC<CertificationsSectionProps> = ({ theme }) => {

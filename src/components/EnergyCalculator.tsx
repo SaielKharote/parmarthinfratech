@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 interface EnergyCalculatorProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
   onOpenQuoteWithDetails: (notes: string) => void;
 }
 

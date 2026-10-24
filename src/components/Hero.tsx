@@ -3,7 +3,7 @@ import { CheckCircle2, Phone, MessageSquare, Instagram, ExternalLink, Zap, MapPi
 import { ThemeMode } from '../types';
 
 interface HeroProps {
-  theme: ThemeMode;
+  theme?: ThemeMode;
   onSelectModel: (type: 'solar' | 'meter' | 'transformer' | 'ev') => void;
   onOpenQuoteModal: () => void;
 }
