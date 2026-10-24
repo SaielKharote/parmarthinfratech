@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
+import { ClienteleTicker } from './components/ClienteleTicker';
 import { LiveBackground } from './components/LiveBackground';
 import { Hero } from './components/Hero';
 import { ProjectsSlider } from './components/ProjectsSlider';
 import { OrganizationSection } from './components/OrganizationSection';
 import { ServicesSection } from './components/ServicesSection';
-import { ProjectsSection } from './components/ProjectsSection';
 import { LazyModelViewer } from './components/ModelViewer3D/LazyModelViewer';
 import { HseSection } from './components/HseSection';
 import { InstagramSection } from './components/InstagramSection';
@@ -58,6 +58,9 @@ export default function App() {
       {/* Top Bar Navigation */}
       <Navbar onOpenQuoteModal={() => handleOpenQuoteModal()} />
 
+      {/* Topmost Moving Clientele & Strategic Partners Strip */}
+      <ClienteleTicker />
+
       {/* Main Content Sections */}
       <main>
         {/* 1. Integrated Infrastructure Hero Section */}
@@ -90,17 +93,7 @@ export default function App() {
           />
         </div>
 
-        {/* 4. Notable Execution Projects (PCMC Administrative Building, Adani AMI, Finolex, Ranjangaon, WTP) */}
-        <div className="optimize-rendering">
-          <ProjectsSection
-            onSelectProjectForRFP={(project) => {
-              setQuoteNotes(`Inquiry regarding project scope & execution similar to: ${project}`);
-              setIsQuoteOpen(true);
-            }}
-          />
-        </div>
-
-        {/* 5. Interactive 3D Equipment & Substation Viewport */}
+        {/* 4. Interactive 3D Equipment & Substation Viewport */}
         <section id="3d-twin" className="py-14 md:py-24 border-t border-slate-800/80 scroll-mt-20 optimize-rendering">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 sm:gap-6 mb-6 sm:mb-8">

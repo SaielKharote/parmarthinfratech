@@ -135,7 +135,7 @@ export const ProjectsSlider: React.FC<ProjectsSliderProps> = ({ onSelectProjectF
   const trainCards = [...featuredProjects, ...featuredProjects];
 
   return (
-    <section className="w-full my-6 sm:my-8 border-y border-slate-800/80 bg-slate-950/90 backdrop-blur-md relative overflow-hidden">
+    <section id="projects" className="w-full my-6 sm:my-8 border-y border-slate-800/80 bg-slate-950/90 backdrop-blur-md relative overflow-hidden scroll-mt-20">
       {/* Header Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-5 pb-3 border-b border-slate-800/60">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
