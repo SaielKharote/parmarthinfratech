@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { 
   ShieldCheck, 
-  Flame, 
-  Award, 
-  Truck, 
   CheckCircle, 
   ZoomIn, 
   X, 
-  AlertTriangle,
-  HardHat,
-  Users,
-  MapPin
+  HardHat, 
+  MapPin, 
+  Truck,
+  Award
 } from 'lucide-react';
 import { ThemeMode } from '../types';
 
@@ -31,16 +28,15 @@ interface HsePhotoItem {
 
 export const HseSection: React.FC<HseSectionProps> = () => {
   const [selectedPhoto, setSelectedPhoto] = useState<HsePhotoItem | null>(null);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'tbt' | 'drills' | 'height' | 'induction'>('all');
 
-  const hsePhotos: HsePhotoItem[] = [
+  const hsePhotosRow1: HsePhotoItem[] = [
     {
       id: 'work-at-height',
       title: 'Training for Work at Height',
       category: 'height',
       tag: 'Work at Height',
       image: '/assets/hse/work_at_height.jpg',
-      description: 'Certified HSE safety supervisor demonstrating full-body safety harness deployment, double shock-absorbing lanyards, and anchor points to site engineers and technicians prior to structural elevation works.',
+      description: 'Certified HSE safety supervisor demonstrating full-body safety harness deployment, double shock-absorbing lanyards, and anchor points to site engineers.',
       location: 'PCMC / Pune Infrastructure Site',
       protocols: [
         '100% Tie-Off Policy with dual lanyards & shock absorbers',
@@ -54,7 +50,7 @@ export const HseSection: React.FC<HseSectionProps> = () => {
       category: 'drills',
       tag: 'Fire Mock Drill',
       image: '/assets/hse/fire_mock_drill.jpg',
-      description: 'Mandatory on-site fire drill demonstrating active discharge of dry chemical powder (DCP) and CO2 extinguishers on a controlled test fire pan with full workforce participation.',
+      description: 'Mandatory on-site fire drill demonstrating active discharge of dry chemical powder (DCP) and CO2 extinguishers on a controlled test fire pan.',
       location: 'Civil & Industrial Site, Maharashtra',
       protocols: [
         'Hands-on PASS technique (Pull, Aim, Squeeze, Sweep) for all field workers',
@@ -68,7 +64,7 @@ export const HseSection: React.FC<HseSectionProps> = () => {
       category: 'tbt',
       tag: 'Daily TBT',
       image: '/assets/hse/daily_tbt_morning.jpg',
-      description: 'Daily morning safety huddle conducted by HSE officers and site in-charges before work commencement to review daily tasks, identify blind spots, and review mandatory PPE.',
+      description: 'Daily morning safety huddle conducted by HSE officers and site in-charges before work commencement to review daily tasks and PPE.',
       location: 'Deep Foundation Project, Pune',
       protocols: [
         'Task-specific Job Safety Analysis (JSA) review with workers',
@@ -82,7 +78,7 @@ export const HseSection: React.FC<HseSectionProps> = () => {
       category: 'tbt',
       tag: 'Daily TBT',
       image: '/assets/hse/daily_tbt_excavation.jpg',
-      description: 'Specialized toolbox briefing conducted along deep excavation trenches and tower crane lifting zones, reviewing soil stability, barricades, and swing-radius safety.',
+      description: 'Specialized toolbox briefing conducted along deep excavation trenches and tower crane lifting zones, reviewing soil stability & swing radius.',
       location: 'Heavy Civil Infrastructure Site',
       protocols: [
         'Safe distance protocols around heavy excavators, piling rigs & cranes',
@@ -90,13 +86,16 @@ export const HseSection: React.FC<HseSectionProps> = () => {
         'Designated banksmen and signalmen for blind equipment maneuvers',
       ],
     },
+  ];
+
+  const hsePhotosRow2: HsePhotoItem[] = [
     {
       id: 'induction-training',
       title: 'Site Induction Safety Training',
       category: 'induction',
       tag: 'Induction Training',
       image: '/assets/hse/induction_training.jpg',
-      description: 'Comprehensive indoor safety orientation conducted inside modular site office cabins for all newly joined technicians, contractors, and machine operators before gate entry.',
+      description: 'Comprehensive indoor safety orientation conducted inside modular site office cabins for all newly joined technicians, contractors, and machine operators.',
       location: 'Project Site Office, Pune HQ Operations',
       protocols: [
         'Company Zero Harm policy & statutory legal safety guidelines',
@@ -110,7 +109,7 @@ export const HseSection: React.FC<HseSectionProps> = () => {
       category: 'height',
       tag: 'Electrical Safety',
       image: '/assets/hse/transmission_safety.jpg',
-      description: 'Specialized aerial safety protocols for electrical linemen and engineers performing high-voltage tower erections, insulator stringing, and substation grid connections.',
+      description: 'Specialized aerial safety protocols for electrical linemen and engineers performing high-voltage tower erections and substation grid connections.',
       location: 'Power Distribution & Transmission Network',
       protocols: [
         'Non-conductive fiberglass tools & electrostatic discharge gear',
@@ -118,17 +117,45 @@ export const HseSection: React.FC<HseSectionProps> = () => {
         'Certified high-altitude tower climbing harnesses and positioning ropes',
       ],
     },
+    {
+      id: 'substation-earthing',
+      title: 'Substation Earthing & Discharge Rods',
+      category: 'electrical',
+      tag: 'Substation Safety',
+      image: '/assets/hse/daily_tbt_morning.jpg',
+      description: 'Pre-commissioning electrical discharge and earthing grid testing protocols conducted at 33kV outdoor switchyard facilities.',
+      location: '33kV Electrical Substation, Pune Zone',
+      protocols: [
+        'Multi-point earth pit resistance measurement & neutral grounding audit',
+        'High-voltage insulated gloves and rubber matting verification',
+        'Double-person authorization for breaker charging & LOTO tag placement',
+      ],
+    },
+    {
+      id: 'trench-barricading',
+      title: 'Trench Barricading & Night Lighting',
+      category: 'civil',
+      tag: 'Site Barricading',
+      image: '/assets/hse/daily_tbt_excavation.jpg',
+      description: 'High-visibility fluorescent perimeter fencing, solar warning flashers, and hard timber shoring along municipal road trenching.',
+      location: 'Municipal Transit Cable Corridor',
+      protocols: [
+        'Continuous retro-reflective warning tape & solar strobe lights',
+        'Safe pedestrian bridges with handrails across deep excavation slots',
+        '24x7 site watchmen monitoring deep trench perimeters',
+      ],
+    },
   ];
 
-  const filteredPhotos = activeFilter === 'all'
-    ? hsePhotos
-    : hsePhotos.filter(p => p.category === activeFilter);
+  // Duplicate each row for continuous seamless looping
+  const trainRow1 = [...hsePhotosRow1, ...hsePhotosRow1];
+  const trainRow2 = [...hsePhotosRow2, ...hsePhotosRow2];
 
   return (
-    <section id="hse" className="py-16 md:py-24 border-t border-slate-800/80 bg-slate-950/70 scroll-mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="hse" className="py-16 md:py-24 border-t border-slate-800/80 bg-slate-950/70 scroll-mt-20 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-12">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
+        <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-semibold uppercase tracking-wider mb-3">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Zero Harm Policy · ISO 45001 Compliance</span>
@@ -137,98 +164,123 @@ export const HseSection: React.FC<HseSectionProps> = () => {
             HSE Implementation at Project Sites
           </h2>
           <p className="mt-3 text-slate-300 text-xs sm:text-base leading-relaxed">
-            Real photographic documentation from active Parmaarth Infratech project sites across Maharashtra. Safety is not a theoretical checklist—it is enforced daily across every shift, trench, elevation, and substation.
+            Real photographic documentation from active Parmaarth Infratech project sites across Maharashtra. Safety is enforced daily across every shift, trench, elevation, and substation.
           </p>
         </div>
+      </div>
 
-        {/* Filter Navigation */}
-        <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-8 sm:mb-10 overflow-x-auto pb-2">
-          {[
-            { id: 'all', label: 'All HSE Field Photos' },
-            { id: 'tbt', label: 'Daily TBT Briefings' },
-            { id: 'height', label: 'Work at Height' },
-            { id: 'drills', label: 'Fire Mock Drills' },
-            { id: 'induction', label: 'Induction Training' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveFilter(tab.id as typeof activeFilter)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
-                activeFilter === tab.id
-                  ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20'
-                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      {/* Dual Moving Train Marquee Container */}
+      <div className="space-y-6 relative">
+        {/* Left & Right Edge Fades */}
+        <div className="absolute top-0 bottom-0 left-0 w-12 sm:w-28 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-12 sm:w-28 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
 
-        {/* HSE Real Project Photo Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-          {filteredPhotos.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => setSelectedPhoto(item)}
-              className="group rounded-3xl overflow-hidden border border-slate-800 bg-slate-900/80 hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between shadow-xl cursor-pointer hover:-translate-y-1"
-            >
-              <div>
-                {/* Photo Container */}
-                <div className="relative aspect-[16/10] bg-slate-950 overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  
-                  {/* Subtle Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
-
-                  {/* HSE Tag Badge (matching user slide style in sleek modern design) */}
-                  <div className="absolute top-3 left-3 px-3 py-1 rounded-lg bg-amber-400/90 text-slate-950 font-bold font-mono text-[11px] shadow-lg flex items-center gap-1.5 backdrop-blur-sm">
-                    <HardHat className="w-3.5 h-3.5" />
-                    <span>{item.tag}</span>
+        {/* Row 1: Upper Row Moving RIGHT -> animate-train-track-reverse */}
+        <div className="overflow-hidden py-1">
+          <div className="animate-train-track-reverse gap-4 sm:gap-6 px-4">
+            {trainRow1.map((item, idx) => (
+              <div
+                key={`row1-${item.id}-${idx}`}
+                onClick={() => setSelectedPhoto(item)}
+                className="w-[280px] sm:w-[340px] shrink-0 rounded-2xl border border-slate-800 bg-slate-900/80 hover:border-emerald-500/60 transition-all duration-300 overflow-hidden cursor-pointer hover:scale-[1.02] shadow-xl group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative aspect-[16/10] bg-slate-950 overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-lg bg-amber-400 text-slate-950 font-bold font-mono text-[11px] shadow flex items-center gap-1">
+                      <HardHat className="w-3 h-3" />
+                      <span>{item.tag}</span>
+                    </div>
+                    <div className="absolute bottom-2.5 right-2.5 p-1.5 rounded-lg bg-slate-950/80 text-emerald-400 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 text-[10px] text-slate-300 font-mono bg-slate-950/80 px-2 py-0.5 rounded backdrop-blur-sm">
+                      <MapPin className="w-3 h-3 text-cyan-400" />
+                      <span className="truncate max-w-[170px]">{item.location}</span>
+                    </div>
                   </div>
 
-                  {/* Zoom Action Cue */}
-                  <div className="absolute bottom-3 right-3 p-2 rounded-xl bg-slate-950/80 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ZoomIn className="w-4 h-4 text-emerald-400" />
-                  </div>
-
-                  {/* Location Pin */}
-                  <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[10px] text-slate-300 font-mono bg-slate-950/70 px-2 py-0.5 rounded-md backdrop-blur-sm">
-                    <MapPin className="w-3 h-3 text-cyan-400" />
-                    <span>{item.location}</span>
+                  <div className="p-4 space-y-1.5">
+                    <h3 className="text-sm font-bold font-heading text-slate-100 group-hover:text-emerald-400 transition-colors line-clamp-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                      {item.description}
+                    </p>
                   </div>
                 </div>
 
-                {/* Content */}
-                <div className="p-5 sm:p-6 space-y-2.5">
-                  <h3 className="text-base sm:text-lg font-bold font-heading text-slate-100 group-hover:text-emerald-400 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom Quick Protocol Checklist */}
-              <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-3 border-t border-slate-800/80">
-                <div className="space-y-1.5 text-[11px] text-slate-400">
-                  <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                    <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                <div className="px-4 pb-3.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-emerald-400">
+                  <span className="flex items-center gap-1 font-medium truncate">
+                    <CheckCircle className="w-3 h-3 shrink-0" />
                     <span className="truncate">{item.protocols[0]}</span>
-                  </div>
+                  </span>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
+        {/* Row 2: Lower Row Moving LEFT -> animate-train-track */}
+        <div className="overflow-hidden py-1">
+          <div className="animate-train-track gap-4 sm:gap-6 px-4">
+            {trainRow2.map((item, idx) => (
+              <div
+                key={`row2-${item.id}-${idx}`}
+                onClick={() => setSelectedPhoto(item)}
+                className="w-[280px] sm:w-[340px] shrink-0 rounded-2xl border border-slate-800 bg-slate-900/80 hover:border-cyan-500/60 transition-all duration-300 overflow-hidden cursor-pointer hover:scale-[1.02] shadow-xl group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative aspect-[16/10] bg-slate-950 overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-lg bg-cyan-400 text-slate-950 font-bold font-mono text-[11px] shadow flex items-center gap-1">
+                      <HardHat className="w-3 h-3" />
+                      <span>{item.tag}</span>
+                    </div>
+                    <div className="absolute bottom-2.5 right-2.5 p-1.5 rounded-lg bg-slate-950/80 text-cyan-400 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 text-[10px] text-slate-300 font-mono bg-slate-950/80 px-2 py-0.5 rounded backdrop-blur-sm">
+                      <MapPin className="w-3 h-3 text-cyan-400" />
+                      <span className="truncate max-w-[170px]">{item.location}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-4 space-y-1.5">
+                    <h3 className="text-sm font-bold font-heading text-slate-100 group-hover:text-cyan-400 transition-colors line-clamp-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="px-4 pb-3.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-cyan-400">
+                  <span className="flex items-center gap-1 font-medium truncate">
+                    <CheckCircle className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{item.protocols[0]}</span>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16">
         {/* 4 Core Standards Bar */}
-        <div className="mt-12 sm:mt-16 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center">
             <div className="text-xl sm:text-2xl font-bold font-mono text-emerald-400">100%</div>
             <div className="text-xs font-semibold text-slate-200 mt-0.5">PPE Gate Compliance</div>

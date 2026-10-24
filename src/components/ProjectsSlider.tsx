@@ -148,10 +148,6 @@ export const ProjectsSlider: React.FC<ProjectsSliderProps> = ({ onSelectProjectF
                 <span className="text-[10px] sm:text-xs font-mono uppercase tracking-wider font-semibold text-cyan-400">
                   Track Record & Accomplishments
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-mono text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>Moving Accomplishments Train</span>
-                </span>
               </div>
               <h2 className="text-sm sm:text-base font-bold text-slate-100 font-heading">
                 Notable Execution Portfolio (₹320+ Million Completed Works)

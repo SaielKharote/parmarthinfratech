@@ -124,13 +124,22 @@
   }
 }
 
-/* Continuous Moving Train Track Marquee for Accomplishments */
+/* Continuous Moving Train Track Marquee for Accomplishments & HSE */
 @keyframes trainMarquee {
   0% {
     transform: translate3d(0, 0, 0);
   }
   100% {
     transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes trainMarqueeReverse {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -141,8 +150,17 @@
   will-change: transform;
 }
 
+.animate-train-track-reverse {
+  display: flex;
+  width: max-content;
+  animation: trainMarqueeReverse 38s linear infinite;
+  will-change: transform;
+}
+
 .animate-train-track:hover,
-.animate-train-track.paused {
+.animate-train-track-reverse:hover,
+.animate-train-track.paused,
+.animate-train-track-reverse.paused {
   animation-play-state: paused;
 }
 
