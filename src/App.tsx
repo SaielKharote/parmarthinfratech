@@ -84,18 +84,18 @@ export default function App() {
         />
 
         {/* 4. Interactive 3D Equipment Viewport Section */}
-        <section id="3d-twin" className="py-16 md:py-24 border-t border-slate-800/80">
+        <section id="3d-twin" className="py-14 md:py-24 border-t border-slate-800/80 scroll-mt-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 sm:gap-6 mb-6 sm:mb-8">
               <div>
                 <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400">
                   <Box className="w-4 h-4" />
                   <span>3D Interactive Inspection</span>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-slate-100 mt-2">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-heading text-slate-100 mt-2">
                   See Our Solar & Power Equipment in 3D
                 </h2>
-                <p className="mt-2 text-slate-300 text-sm max-w-2xl leading-relaxed">
+                <p className="mt-2 text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
                   Rotate 360° to inspect how our solar panels, smart meters, substation transformers, and fast car chargers work. Click the "Exploded" slider below to see inside the parts!
                 </p>
               </div>
@@ -110,7 +110,7 @@ export default function App() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  ☀️ Solar Panel Array
+                  ☀️ Solar Panels
                 </button>
                 <button
                   onClick={() => setSelected3DModel('meter')}
@@ -130,7 +130,7 @@ export default function App() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  🔌 Substation Transformer
+                  🔌 Transformer
                 </button>
                 <button
                   onClick={() => setSelected3DModel('ev')}
@@ -140,7 +140,7 @@ export default function App() {
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  🔋 EV Car Charger
+                  🔋 EV Charger
                 </button>
               </div>
             </div>

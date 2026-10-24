@@ -5,9 +5,9 @@ interface LogoProps {
   showText?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ className = 'w-9 h-9', showText = true }) => {
+export const Logo: React.FC<LogoProps> = ({ className = 'w-8 h-8 sm:w-9 sm:h-9', showText = true }) => {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2.5 sm:gap-3">
       {/* Authentic PIPL Emblem matching company identity */}
       <svg
         viewBox="0 0 100 120"
@@ -39,15 +39,15 @@ export const Logo: React.FC<LogoProps> = ({ className = 'w-9 h-9', showText = tr
 
       {showText && (
         <div className="flex flex-col">
-          <div className="flex items-center gap-2">
-            <span className="font-heading font-extrabold text-xl tracking-tight text-slate-100">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="font-heading font-extrabold text-lg sm:text-xl tracking-tight text-slate-100">
               PIPL
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30 font-mono">
+            <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold border border-emerald-500/30 font-mono">
               SOLAR & EPC
             </span>
           </div>
-          <span className="text-[11px] font-medium text-slate-400">
+          <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 hidden sm:block">
             Parmaarth Infratech Pvt. Ltd.
           </span>
         </div>

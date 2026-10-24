@@ -14,8 +14,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   theme,
   onToggleTheme,
-  backgroundStyle,
-  onChangeBackgroundStyle,
   onOpenQuoteModal,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -29,38 +27,38 @@ export const Navbar: React.FC<NavbarProps> = ({
           : 'bg-white/95 border-slate-200 text-slate-900 shadow-sm'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-3 sm:gap-6">
         {/* Zone 1: Authentic Brand Logo */}
-        <a href="#" className="flex items-center gap-3 whitespace-nowrap shrink-0 focus:outline-none">
+        <a href="#" className="flex items-center gap-2 sm:gap-3 whitespace-nowrap shrink-0 focus:outline-none">
           <Logo showText={true} />
         </a>
 
         {/* Zone 2: Simple & Clear Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+        <nav className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-medium">
           <a
             href="#subsidy"
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
           >
-            Solar Subsidy & Schemes
+            Solar Subsidy
           </a>
           <a
             href="#calculator"
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
           >
-            Bill Savings Calculator
+            Bill Calculator
           </a>
           <a
             href="#instagram-feed"
             className="text-slate-300 hover:text-rose-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8 flex items-center gap-1.5"
           >
             <Instagram className="w-3.5 h-3.5 text-rose-400" />
-            <span>Instagram Feed</span>
+            <span>Instagram</span>
           </a>
           <a
             href="#3d-twin"
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
           >
-            3D Equipment View
+            3D Equipment
           </a>
           <a
             href="#solutions"
@@ -76,21 +74,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           </a>
         </nav>
 
-        {/* Zone 3: Direct WhatsApp / Call + Theme Toggle + Quote CTA */}
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Zone 3: Direct Actions + Theme Toggle + Quote CTA */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Instagram quick icon */}
           <a
             href="https://www.instagram.com/parmaarthinfratechpvt/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors"
+            className="hidden xl:flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors"
             title="Follow @parmaarthinfratechpvt on Instagram"
           >
             <Instagram className="w-3.5 h-3.5" />
             <span>@parmaarthinfratechpvt</span>
           </a>
 
-          {/* Quick WhatsApp button for Indian users */}
+          {/* Quick WhatsApp button */}
           <a
             href="https://wa.me/917666121210?text=Hello%20Parmaarth%20Infratech,%20I%20am%20interested%20in%20solar%20rooftop%20installation"
             target="_blank"
@@ -105,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Theme Mode Toggle */}
           <button
             onClick={onToggleTheme}
-            className={`p-2 rounded-lg border transition-colors ${
+            className={`p-1.5 sm:p-2 rounded-lg border transition-colors ${
               isDark
                 ? 'bg-slate-900 border-slate-700 text-amber-400 hover:text-amber-300'
                 : 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
@@ -118,15 +116,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Primary Action Button */}
           <button
             onClick={onOpenQuoteModal}
-            className="px-4 py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors shadow-sm whitespace-nowrap shrink-0"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors shadow-sm whitespace-nowrap shrink-0"
           >
-            Get Free Quote
+            <span className="hidden sm:inline">Get Free </span>Quote
           </button>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white"
+            className="md:hidden p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-white"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -136,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile menu dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-3 animate-fade-in">
+        <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-3">
           <a
             href="#subsidy"
             onClick={() => setMobileMenuOpen(false)}
@@ -205,7 +203,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onOpenQuoteModal();
               }}
-              className="w-full py-2.5 text-xs font-semibold rounded-lg bg-cyan-500 text-slate-950"
+              className="w-full py-2.5 text-xs font-semibold rounded-lg bg-cyan-500 text-slate-950 font-bold"
             >
               Get Free Quote
             </button>

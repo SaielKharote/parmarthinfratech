@@ -68,37 +68,37 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({ th
         </div>
 
         {/* Statutory Identifiers Card */}
-        <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 mb-12 backdrop-blur-sm">
-          <div className="flex items-center gap-2 mb-4 text-xs font-semibold uppercase font-mono tracking-wider text-cyan-400">
+        <div className="p-4 sm:p-6 rounded-2xl border border-slate-800 bg-slate-900/60 mb-10 sm:mb-12 backdrop-blur-sm">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4 text-xs font-semibold uppercase font-mono tracking-wider text-cyan-400">
             <FileCheck className="w-4 h-4" />
             <span>Corporate & Statutory Registrations</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
-            <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-              <div className="text-slate-500 font-sans text-[11px]">Company CIN</div>
-              <div className="text-slate-200 font-bold mt-1 select-all">U41001PN2024PTC230231</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 text-xs font-mono">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+              <div className="text-slate-500 font-sans text-[10px] sm:text-[11px]">Company CIN</div>
+              <div className="text-slate-200 font-bold mt-0.5 sm:mt-1 select-all break-all text-[11px] sm:text-xs">U41001PN2024PTC230231</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-              <div className="text-slate-500 font-sans text-[11px]">GST / PAN</div>
-              <div className="text-slate-200 font-bold mt-1 select-all">27AAOCP6697F1ZO</div>
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+              <div className="text-slate-500 font-sans text-[10px] sm:text-[11px]">GST / PAN</div>
+              <div className="text-slate-200 font-bold mt-0.5 sm:mt-1 select-all break-all text-[11px] sm:text-xs">27AAOCP6697F1ZO</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-              <div className="text-slate-500 font-sans text-[11px]">PF Registration</div>
-              <div className="text-slate-200 font-bold mt-1 select-all">PUPUN3261563000</div>
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+              <div className="text-slate-500 font-sans text-[10px] sm:text-[11px]">PF Registration</div>
+              <div className="text-slate-200 font-bold mt-0.5 sm:mt-1 select-all break-all text-[11px] sm:text-xs">PUPUN3261563000</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-              <div className="text-slate-500 font-sans text-[11px]">PTRC / PTEC</div>
-              <div className="text-slate-200 font-bold mt-1 select-all">27452340747P</div>
+            <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+              <div className="text-slate-500 font-sans text-[10px] sm:text-[11px]">PTRC / PTEC</div>
+              <div className="text-slate-200 font-bold mt-0.5 sm:mt-1 select-all break-all text-[11px] sm:text-xs">27452340747P</div>
             </div>
           </div>
         </div>
 
         {/* 4 Pillars Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {certifications.map((c, i) => (
             <div
               key={i}
-              className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-cyan-500/40 transition-colors flex flex-col justify-between"
+              className="p-4 sm:p-6 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-cyan-500/40 transition-colors flex flex-col justify-between"
             >
               <div>
                 <div className="inline-block px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-400 font-mono text-[11px] font-semibold mb-3">

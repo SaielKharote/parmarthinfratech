@@ -71,7 +71,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
       onClick={onClose}
     >
       <div
-        className={`w-full max-w-2xl rounded-3xl border p-6 sm:p-8 shadow-2xl transition-all max-h-[90vh] overflow-y-auto ${
+        className={`w-full max-w-2xl rounded-3xl border p-4 sm:p-8 shadow-2xl transition-all max-h-[92vh] overflow-y-auto ${
           isDark
             ? 'bg-slate-900 border-slate-700 text-slate-100'
             : 'bg-white border-slate-200 text-slate-900'

@@ -44,16 +44,16 @@ export const ModelDock: React.FC<ModelDockProps> = ({
 
   return (
     <div
-      className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-xl z-30 transition-transform duration-300 ease-out select-none"
+      className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 w-[94%] sm:w-[90%] max-w-xl z-30 transition-transform duration-300 ease-out select-none"
       style={{
-        transform: isCollapsed ? 'translate(-50%, calc(100% - 32px))' : 'translate(-50%, 0)',
+        transform: isCollapsed ? 'translate(-50%, calc(100% - 28px))' : 'translate(-50%, 0)',
       }}
     >
       {/* Collapse / Expand Tab Button */}
-      <div className="flex justify-center mb-1">
+      <div className="flex justify-center mb-0.5 sm:mb-1">
         <button
           onClick={onToggleCollapse}
-          className={`flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-t-lg border border-b-0 shadow-sm transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-1 text-[10px] sm:text-[11px] font-medium rounded-t-lg border border-b-0 shadow-sm transition-colors ${
             isDark 
               ? 'bg-slate-900/95 text-slate-300 border-slate-700/80 hover:text-white' 
               : 'bg-white/95 text-slate-700 border-slate-300 hover:text-slate-950'
@@ -69,7 +69,7 @@ export const ModelDock: React.FC<ModelDockProps> = ({
           ) : (
             <>
               <ChevronDown className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Hide Controls (Zen View)</span>
+              <span>Hide Controls</span>
             </>
           )}
         </button>
@@ -77,17 +77,17 @@ export const ModelDock: React.FC<ModelDockProps> = ({
 
       {/* Main Glassmorphic Dock Container */}
       <div
-        className={`px-4 py-3 rounded-2xl border shadow-2xl backdrop-blur-md transition-colors ${
+        className={`px-3 py-2 sm:px-4 sm:py-3 rounded-2xl border shadow-2xl backdrop-blur-md transition-colors ${
           isDark
             ? 'bg-slate-900/95 border-slate-700/80 text-slate-200'
             : 'bg-white/95 border-slate-200 text-slate-800'
         }`}
       >
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-xs">
           {/* Exploded Assembly Slider */}
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <Sliders className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-            <span className="font-medium whitespace-nowrap text-[11px]">Exploded:</span>
+            <span className="font-medium whitespace-nowrap text-[10px] sm:text-[11px]">Exploded:</span>
             <input
               type="range"
               min="0"
@@ -98,17 +98,17 @@ export const ModelDock: React.FC<ModelDockProps> = ({
               className="flex-1 sm:w-28 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400"
               aria-label="Exploded assembly slider"
             />
-            <span className="font-mono text-cyan-400 w-7 text-right text-[11px]">
+            <span className="font-mono text-cyan-400 w-6 text-right text-[10px] sm:text-[11px]">
               {Math.round(explodedValue * 100)}%
             </span>
           </div>
 
           {/* Controls Cluster */}
-          <div className="flex items-center gap-2 justify-end w-full sm:w-auto flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 justify-between sm:justify-end w-full sm:w-auto">
             {/* Wireframe CAD mode */}
             <button
               onClick={onToggleWireframe}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-[11px] font-medium transition-colors ${
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] sm:text-[11px] font-medium transition-colors ${
                 isWireframe
                   ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300'
                   : isDark
@@ -124,7 +124,7 @@ export const ModelDock: React.FC<ModelDockProps> = ({
             {/* Auto Orbit */}
             <button
               onClick={onToggleAutoRotate}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-[11px] font-medium transition-colors ${
+              className={`flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] sm:text-[11px] font-medium transition-colors ${
                 autoRotate
                   ? 'bg-cyan-950/80 border-cyan-500 text-cyan-300'
                   : isDark
@@ -133,14 +133,14 @@ export const ModelDock: React.FC<ModelDockProps> = ({
               }`}
             >
               <Maximize2 className="w-3 h-3" />
-              <span>{autoRotate ? 'Orbit: ON' : 'Orbit: OFF'}</span>
+              <span>{autoRotate ? 'Orbit' : 'Static'}</span>
             </button>
 
             {/* Lighting Presets */}
             <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-800/60 border border-slate-700/60">
               <button
                 onClick={() => onSelectLighting('daylight')}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                className={`px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium transition-colors ${
                   lightingPreset === 'daylight'
                     ? 'bg-slate-600 text-white'
                     : 'text-slate-400 hover:text-slate-200'
@@ -151,7 +151,7 @@ export const ModelDock: React.FC<ModelDockProps> = ({
               </button>
               <button
                 onClick={() => onSelectLighting('cyber')}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                className={`px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium transition-colors ${
                   lightingPreset === 'cyber'
                     ? 'bg-cyan-500 text-slate-950'
                     : 'text-slate-400 hover:text-slate-200'
@@ -162,7 +162,7 @@ export const ModelDock: React.FC<ModelDockProps> = ({
               </button>
               <button
                 onClick={() => onSelectLighting('sunset')}
-                className={`px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                className={`px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-medium transition-colors ${
                   lightingPreset === 'sunset'
                     ? 'bg-amber-500 text-slate-950'
                     : 'text-slate-400 hover:text-slate-200'

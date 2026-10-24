@@ -68,13 +68,13 @@ export const HseSection: React.FC<HseSectionProps> = ({ theme }) => {
         </div>
 
         {/* 4 HSE Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {hseProtocols.map((p, idx) => {
             const Icon = p.icon;
             return (
               <div
                 key={idx}
-                className="p-6 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 transition-colors flex flex-col justify-between"
+                className="p-4 sm:p-6 rounded-2xl border border-slate-800 bg-slate-900/40 hover:border-slate-700 transition-colors flex flex-col justify-between"
               >
                 <div>
                   <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-4">
@@ -97,7 +97,7 @@ export const HseSection: React.FC<HseSectionProps> = ({ theme }) => {
         </div>
 
         {/* Tools, Machinery & Logistics Banner */}
-        <div className="p-8 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-950/70">
+        <div className="p-4 sm:p-8 rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/70 to-slate-950/70">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-slate-800">
             <div>
               <span className="text-xs font-mono uppercase text-cyan-400 tracking-wider">

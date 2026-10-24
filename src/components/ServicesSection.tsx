@@ -221,13 +221,13 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         </div>
 
         {/* Divisions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {filteredDivisions.map((division) => {
             const Icon = division.icon;
             return (
               <div
                 key={division.id}
-                className="flex flex-col justify-between p-6 rounded-2xl border border-slate-800 bg-slate-900/50 hover:border-slate-700 transition-all hover:shadow-xl group"
+                className="flex flex-col justify-between p-4 sm:p-6 rounded-2xl border border-slate-800 bg-slate-900/50 hover:border-slate-700 transition-all hover:shadow-xl group"
               >
                 <div>
                   <div className="flex items-center justify-between gap-3 mb-4">

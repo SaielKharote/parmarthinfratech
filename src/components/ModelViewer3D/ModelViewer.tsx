@@ -9,7 +9,7 @@ import { createTransformerModel } from './models/TransformerModel';
 import { createEVChargerModel } from './models/EVChargerModel';
 import { ModelDock } from './ModelDock';
 import { ComponentDetailModal } from './ComponentDetailModal';
-import { Eye, Info, Sparkles } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 interface ModelViewerProps {
   initialModel?: 'solar' | 'meter' | 'transformer' | 'ev';
@@ -20,9 +20,9 @@ interface ModelViewerProps {
 export const ModelViewer: React.FC<ModelViewerProps> = ({
   initialModel = 'solar',
   theme,
-  onExploreService,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [modelType, setModelType] = useState<'solar' | 'meter' | 'transformer' | 'ev'>(initialModel);
   const [explodedValue, setExplodedValue] = useState<number>(0);
   const [isWireframe, setIsWireframe] = useState<boolean>(false);
@@ -47,6 +47,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     dragStart: { x: 0, y: 0 },
     currentModel: null as Procedural3DModelResult | null,
     hotspotMeshes: [] as { mesh: THREE.Mesh; hotspot: HotspotInfo }[],
+    isVisible: true,
   });
 
   // Keep stateRef synced with React state
@@ -76,7 +77,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     if (!container) return;
 
     let width = container.clientWidth || 800;
-    let height = container.clientHeight || 550;
+    let height = container.clientHeight || 500;
 
     const scene = new THREE.Scene();
     scene.background = null; // Transparent to blend with background
@@ -93,8 +94,9 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.setSize(width, height);
-    renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 2));
-    renderer.shadowMap.enabled = !isSoftwareGl;
+    // Cap pixel ratio to 1.25 on mobile / low-power to prevent GPU stutter
+    renderer.setPixelRatio(isSoftwareGl ? 1 : Math.min(window.devicePixelRatio, 1.5));
+    renderer.shadowMap.enabled = !isSoftwareGl && window.innerWidth >= 768;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     container.appendChild(renderer.domElement);
@@ -107,13 +109,13 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     pmremGenerator.dispose();
 
     // Studio 3-Point Lighting Rig
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.55);
     scene.add(ambientLight);
 
     const keyLight = new THREE.DirectionalLight(0xffffff, 1.8);
     keyLight.position.set(10, 18, 10);
-    keyLight.castShadow = !isSoftwareGl;
-    if (keyLight.castShadow) {
+    if (renderer.shadowMap.enabled) {
+      keyLight.castShadow = true;
       keyLight.shadow.mapSize.width = 1024;
       keyLight.shadow.mapSize.height = 1024;
       keyLight.shadow.bias = -0.0005;
@@ -164,13 +166,11 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
 
     // Helper to load model
     const loadCurrentModel = (type: 'solar' | 'meter' | 'transformer' | 'ev') => {
-      // Clean previous
       if (stateRef.current.currentModel) {
         stateRef.current.currentModel.dispose();
         activeModelGroup.clear();
       }
 
-      // Clear hotspots
       hotspotGroup.clear();
       stateRef.current.hotspotMeshes = [];
 
@@ -241,10 +241,15 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     const domElement = renderer.domElement;
     domElement.addEventListener('click', handleCanvasClick);
 
-    // Mouse / Touch Orbit Controls
+    // Mouse / Touch Orbit Controls (Configured to avoid scroll hijacking)
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+
     const handlePointerDown = (e: PointerEvent) => {
       stateRef.current.isDragging = true;
       stateRef.current.dragStart = { x: e.clientX, y: e.clientY };
+      pointerStartX = e.clientX;
+      pointerStartY = e.clientY;
     };
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -264,18 +269,35 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
       stateRef.current.isDragging = false;
     };
 
+    // Zoom on wheel ONLY when Ctrl key is pressed or inside explicit zoom interaction,
+    // so normal page scrolling is never blocked or hijacked!
     const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      stateRef.current.targetAngle.radius = Math.max(
-        7,
-        Math.min(28, stateRef.current.targetAngle.radius + e.deltaY * 0.015)
-      );
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        stateRef.current.targetAngle.radius = Math.max(
+          7,
+          Math.min(28, stateRef.current.targetAngle.radius + e.deltaY * 0.015)
+        );
+      }
     };
 
     domElement.addEventListener('pointerdown', handlePointerDown);
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
     domElement.addEventListener('wheel', handleWheel, { passive: false });
+
+    // IntersectionObserver: Only render when 3D viewer is visible on screen!
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        stateRef.current.isVisible = entry ? entry.isIntersecting : true;
+      },
+      { threshold: 0.05 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
 
     // Window resize
     const handleResize = () => {
@@ -294,7 +316,13 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     let currentActiveModelType = stateRef.current.modelType;
 
     const render = () => {
-      const delta = clock.getDelta();
+      // If element is offscreen, skip rendering to eliminate CPU/GPU lag!
+      if (!stateRef.current.isVisible) {
+        animationFrameId = scheduleNextFrame(renderer, render);
+        return;
+      }
+
+      const delta = Math.min(clock.getDelta(), 0.1);
       const elapsedTime = clock.getElapsedTime();
 
       // Check if model changed in state
@@ -325,24 +353,6 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
       // Smooth exploded value interpolation
       s.explodedValue += (s.targetExplodedValue - s.explodedValue) * 0.12;
 
-      // Lighting preset updates
-      if (s.lightingPreset === 'cyber') {
-        keyLight.color.setHex(0xe0f2fe);
-        fillLight.color.setHex(0x06b6d4);
-        rimLight.color.setHex(0x38bdf8);
-        keyLight.intensity = 1.9;
-      } else if (s.lightingPreset === 'sunset') {
-        keyLight.color.setHex(0xffedd5);
-        fillLight.color.setHex(0xf97316);
-        rimLight.color.setHex(0xf59e0b);
-        keyLight.intensity = 1.6;
-      } else {
-        keyLight.color.setHex(0xffffff);
-        fillLight.color.setHex(0xdbeafe);
-        rimLight.color.setHex(0xffffff);
-        keyLight.intensity = 2.0;
-      }
-
       // Update model physics / exploded views
       if (s.currentModel) {
         s.currentModel.update(elapsedTime, s.explodedValue, s.isWireframe);
@@ -350,7 +360,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
 
       // Subtle hotspot pulsing scale
       s.hotspotMeshes.forEach((item, idx) => {
-        const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * 0.15;
+        const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * 0.12;
         item.mesh.scale.set(pulse, pulse, pulse);
       });
 
@@ -361,6 +371,7 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
     animationFrameId = scheduleNextFrame(renderer, render);
 
     return () => {
+      observer.disconnect();
       domElement.removeEventListener('click', handleCanvasClick);
       domElement.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointermove', handlePointerMove);
@@ -398,7 +409,8 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
 
   return (
     <div
-      className={`relative w-full h-[620px] rounded-3xl overflow-hidden border shadow-2xl transition-colors ${
+      ref={containerRef}
+      className={`relative w-full h-[400px] sm:h-[500px] md:h-[580px] rounded-3xl overflow-hidden border shadow-2xl transition-colors ${
         isDark
           ? 'bg-slate-950/80 border-slate-800 text-slate-100'
           : 'bg-slate-900/90 border-slate-700 text-slate-100'
@@ -409,32 +421,33 @@ export const ModelViewer: React.FC<ModelViewerProps> = ({
       <div
         ref={mountRef}
         className="w-full h-full cursor-grab active:cursor-grabbing select-none"
+        style={{ touchAction: 'pan-y' }}
         aria-label="3D Interactive Digital Twin Canvas"
         role="img"
       />
 
       {/* Top Spec / Header Badge */}
-      <div className="absolute top-4 left-4 z-20 flex flex-col gap-1 pointer-events-none">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">
+      <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col gap-1 pointer-events-none max-w-[80%] sm:max-w-none">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">
             3D DIGITAL TWIN
           </span>
-          <span className="text-xs text-slate-400 font-mono">
+          <span className="text-[10px] sm:text-xs text-slate-400 font-mono truncate">
             {modelType === 'solar' && 'DUAL-AXIS TRACKER MW ARRAY'}
             {modelType === 'meter' && 'IS 16444 SMART AMI INFRA'}
             {modelType === 'transformer' && '33kV SUBSTATION TRANSFORMER'}
-            {modelType === 'ev' && '150kW DC FAST CHARGER SUPERHUB'}
+            {modelType === 'ev' && '150kW DC FAST CHARGER'}
           </span>
         </div>
-        <div className="text-sm font-semibold text-slate-200">
-          Click markers for technical breakdown · Drag to orbit · Scroll to zoom
+        <div className="text-xs sm:text-sm font-semibold text-slate-200 hidden sm:block">
+          Tap markers to inspect · Drag to orbit 360°
         </div>
       </div>
 
       {/* Top Right Quick Hint */}
-      <div className="absolute top-4 right-4 z-20 hidden sm:flex items-center gap-2 text-xs text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 hidden sm:flex items-center gap-2 text-xs text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
         <Eye className="w-3.5 h-3.5 text-cyan-400" />
-        <span>360° Inspection Engine</span>
+        <span>360° Inspector</span>
       </div>
 
       {/* Collapsible Bottom Control Dock */}

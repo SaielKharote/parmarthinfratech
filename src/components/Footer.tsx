@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mail, MapPin, Globe, Shield, ArrowUp, Instagram } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, ArrowUp, Instagram } from 'lucide-react';
 import { ThemeMode } from '../types';
 import { Logo } from './Logo';
 
@@ -8,9 +8,7 @@ interface FooterProps {
   onOpenQuoteModal: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ theme, onOpenQuoteModal }) => {
-  const isDark = theme === 'dark';
-
+export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -18,13 +16,13 @@ export const Footer: React.FC<FooterProps> = ({ theme, onOpenQuoteModal }) => {
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-slate-400 text-xs">
       {/* Top CTA Banner */}
-      <div className="border-b border-slate-900 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="border-b border-slate-900 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 py-10 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <span className="text-[11px] font-mono uppercase tracking-wider text-cyan-400">
               Future-Ready Infrastructure
             </span>
-            <h3 className="text-2xl font-bold font-heading text-slate-100 mt-1">
+            <h3 className="text-xl sm:text-2xl font-bold font-heading text-slate-100 mt-1">
               Ready to execute your next Civil, Electrical or Solar project?
             </h3>
             <p className="text-slate-400 text-xs mt-1">
@@ -32,28 +30,28 @@ export const Footer: React.FC<FooterProps> = ({ theme, onOpenQuoteModal }) => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto shrink-0">
             <button
               onClick={onOpenQuoteModal}
-              className="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition-colors shadow-lg shadow-cyan-500/20"
+              className="px-6 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition-colors shadow-lg shadow-cyan-500/20 text-center"
             >
               Request Project Proposal
             </button>
             <a
               href="tel:+919359543323"
-              className="px-5 py-3 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-200 transition-colors"
+              className="px-5 py-3 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-200 transition-colors text-center"
             >
-              Direct Call: +91 9359543323
+              Call: +91 93595 43323
             </a>
           </div>
         </div>
       </div>
 
       {/* Main 4-Column Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Col 1 & 2: Brand & Mission */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="sm:col-span-2 space-y-4">
             <Logo showText={true} />
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
@@ -78,7 +76,7 @@ export const Footer: React.FC<FooterProps> = ({ theme, onOpenQuoteModal }) => {
             <ul className="space-y-2.5">
               <li>
                 <a href="#3d-twin" className="hover:text-cyan-400 transition-colors">
-                  3D Digital Twin Visualizer
+                  3D Equipment Visualizer
                 </a>
               </li>
               <li>
@@ -128,7 +126,7 @@ export const Footer: React.FC<FooterProps> = ({ theme, onOpenQuoteModal }) => {
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
                 <span className="leading-relaxed">
-                  103, S.No-14/1, Stanza Building, Laxmi Chowk, Punawale, Pimpri Chinchwad, Pune – 411033, Maharashtra, India
+                  103, S.No-14/1, Stanza Building, Laxmi Chowk, Punawale, Pimpri Chinchwad, Pune – 411033, Maharashtra
                 </span>
               </div>
 
@@ -169,15 +167,15 @@ export const Footer: React.FC<FooterProps> = ({ theme, onOpenQuoteModal }) => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500">
+        <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-center sm:text-left">
           <div>
             © {new Date().getFullYear()} Parmaarth Infratech Pvt. Ltd. (PIPL). All rights reserved.
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
             <span>Govt. Approved Electrical Contractor</span>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="hidden sm:inline">·</span>
             <span>MNRE Approved</span>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true" className="hidden sm:inline">·</span>
             <button
               onClick={scrollToTop}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
