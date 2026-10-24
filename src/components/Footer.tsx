@@ -182,7 +182,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal, onOpenAdminMod
                 <button
                   onClick={onOpenAdminModal}
                   className="text-slate-500 hover:text-cyan-400 text-xs flex items-center gap-1 transition-colors group cursor-pointer"
-                  title="Executive Admin & Leads Dashboard"
+                  title="Admin Portal"
                 >
                   <Lock className="w-3 h-3 text-slate-500 group-hover:text-cyan-400" />
                   <span>Admin Portal</span>

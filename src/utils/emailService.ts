@@ -76,3 +76,60 @@ export async function sendEmailNotification(lead: LeadItem): Promise<EmailSendRe
     };
   }
 }
+
+/**
+ * Dispatches a password reset OTP code directly to the owner's email address
+ */
+export async function sendPasswordResetOtpEmail(otpCode: string): Promise<EmailSendResult> {
+  const endpoint = `https://formsubmit.co/ajax/${PRIMARY_NOTIFICATION_EMAIL}`;
+
+  const payload = {
+    _subject: `🔐 [PIPL Security] Portal Password Reset Verification Code: ${otpCode}`,
+    _template: 'table',
+    _captcha: 'false',
+    _replyto: PRIMARY_NOTIFICATION_EMAIL,
+    Verification_OTP: otpCode,
+    Action: 'Password Reset Request',
+    Notice: 'Use this 6-digit verification code to reset your Portal password. If you did not request this, please disregard.',
+    Requested_At: new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }),
+  };
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 9000);
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      return {
+        success: true,
+        message: `Verification code sent to ${PRIMARY_NOTIFICATION_EMAIL}`,
+      };
+    } else {
+      return {
+        success: false,
+        message: 'Could not dispatch email. Please use Master Key or try again.',
+      };
+    }
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return {
+      success: false,
+      message: errorMsg,
+    };
+  }
+}

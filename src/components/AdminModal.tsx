@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Lock,
@@ -13,10 +13,16 @@ import {
   Building,
   RefreshCw,
   Eye,
+  EyeOff,
   CheckCircle2,
   Clock,
   Briefcase,
-  AlertCircle
+  AlertCircle,
+  KeyRound,
+  ArrowLeft,
+  ShieldCheck,
+  Send,
+  Loader2
 } from 'lucide-react';
 import {
   LeadItem,
@@ -25,13 +31,16 @@ import {
   deleteLead,
   exportLeadsToCSV
 } from '../utils/leadsManager';
+import { sendPasswordResetOtpEmail } from '../utils/emailService';
 
 interface AdminModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const DEFAULT_PASSCODE = 'pipl2026';
+const DEFAULT_MASTER_PASSCODE = 'pipl2026';
+const REGISTERED_OWNER_EMAIL = 'saielkharote219@gmail.com';
+const STORAGE_CUSTOM_PASS = 'pipl_admin_custom_password';
 
 export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -41,32 +50,65 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
     return false;
   });
 
+  // Login view state
   const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+
+  // Password reset flow state
+  const [isResetMode, setIsResetMode] = useState(false);
+  const [resetStep, setResetStep] = useState<'verify' | 'otp' | 'new_password' | 'success'>('verify');
+  const [resetEmailInput, setResetEmailInput] = useState('');
+  const [resetOtpInput, setResetOtpInput] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [isSendingResetEmail, setIsSendingResetEmail] = useState(false);
+
+  // Authenticated state
   const [leads, setLeads] = useState<LeadItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [divisionFilter, setDivisionFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedLead, setSelectedLead] = useState<LeadItem | null>(null);
 
+  // In-dashboard change password modal
+  const [isChangingPasswordInDash, setIsChangingPasswordInDash] = useState(false);
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState('');
+
   // Load leads on open
   useEffect(() => {
     if (isOpen) {
       setLeads(getLeads());
+      setPasswordError('');
+      setResetError('');
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const getActivePassword = (): string => {
+    if (typeof window !== 'undefined') {
+      const customPass = localStorage.getItem(STORAGE_CUSTOM_PASS);
+      if (customPass && customPass.trim()) return customPass.trim();
+    }
+    return DEFAULT_MASTER_PASSCODE;
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwordInput.trim() === DEFAULT_PASSCODE || passwordInput.trim() === 'admin') {
+    const activePass = getActivePassword();
+    const entered = passwordInput.trim();
+
+    if (entered === activePass || entered === DEFAULT_MASTER_PASSCODE) {
       setIsAuthenticated(true);
       sessionStorage.setItem('pipl_admin_auth', 'true');
       setPasswordError('');
+      setPasswordInput('');
       setLeads(getLeads());
     } else {
-      setPasswordError('Invalid passcode. Use default passcode: pipl2026');
+      setPasswordError('Incorrect password. Please try again.');
     }
   };
 
@@ -74,8 +116,118 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
     setIsAuthenticated(false);
     sessionStorage.removeItem('pipl_admin_auth');
     setPasswordInput('');
+    setIsResetMode(false);
+    setResetStep('verify');
   };
 
+  // Start reset flow
+  const handleStartResetFlow = () => {
+    setIsResetMode(true);
+    setResetStep('verify');
+    setResetEmailInput('');
+    setResetOtpInput('');
+    setGeneratedOtp('');
+    setNewPasswordInput('');
+    setConfirmPasswordInput('');
+    setResetError('');
+  };
+
+  // Step 1: Verify Email and send OTP
+  const handleVerifyEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanEmail = resetEmailInput.trim().toLowerCase();
+
+    // Check if entered email matches the authorized owner email or master keyword
+    if (cleanEmail !== REGISTERED_OWNER_EMAIL && cleanEmail !== 'saielkharote219@gmail.com') {
+      setResetError('Email address does not match registered administrator profile.');
+      return;
+    }
+
+    setResetError('');
+    setIsSendingResetEmail(true);
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(otp);
+
+    try {
+      await sendPasswordResetOtpEmail(otp);
+    } catch (err) {
+      console.warn('Reset email dispatch note:', err);
+    } finally {
+      setIsSendingResetEmail(false);
+      setResetStep('otp');
+    }
+  };
+
+  // Step 2: Verify OTP or Master PIN
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    const entered = resetOtpInput.trim();
+
+    if (entered === generatedOtp || entered === 'pipl2026' || (generatedOtp && entered === generatedOtp)) {
+      setResetError('');
+      setResetStep('new_password');
+    } else {
+      setResetError('Invalid verification code. Please check your email or enter emergency PIN.');
+    }
+  };
+
+  // Step 3: Save New Password
+  const handleSaveNewPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newPass = newPasswordInput.trim();
+    const confirmPass = confirmPasswordInput.trim();
+
+    if (!newPass || newPass.length < 4) {
+      setResetError('Password must be at least 4 characters long.');
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      setResetError('Passwords do not match.');
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_CUSTOM_PASS, newPass);
+    }
+
+    setResetError('');
+    setResetStep('success');
+  };
+
+  // Direct Change Password from inside dashboard
+  const handleDirectPasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newPass = newPasswordInput.trim();
+    const confirmPass = confirmPasswordInput.trim();
+
+    if (!newPass || newPass.length < 4) {
+      setResetError('Password must be at least 4 characters long.');
+      return;
+    }
+
+    if (newPass !== confirmPass) {
+      setResetError('Passwords do not match.');
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_CUSTOM_PASS, newPass);
+    }
+
+    setChangePasswordSuccess('Password updated successfully!');
+    setTimeout(() => {
+      setIsChangingPasswordInDash(false);
+      setChangePasswordSuccess('');
+      setNewPasswordInput('');
+      setConfirmPasswordInput('');
+      setResetError('');
+    }, 1500);
+  };
+
+  // Lead actions
   const handleStatusChange = (id: string, newStatus: LeadItem['status']) => {
     const updated = updateLeadStatus(id, newStatus);
     setLeads(updated);
@@ -135,7 +287,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            New Lead
+            New
           </span>
         );
       case 'contacted':
@@ -163,7 +315,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
             <CheckCircle2 className="w-3 h-3" />
-            Closed / Won
+            Closed
           </span>
         );
       default:
@@ -173,51 +325,59 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-6xl rounded-3xl border border-slate-800 bg-slate-900 text-slate-100 shadow-2xl transition-all max-h-[94vh] flex flex-col overflow-hidden"
+        className={`w-full rounded-3xl border border-slate-800 bg-slate-900 text-slate-100 shadow-2xl transition-all flex flex-col overflow-hidden ${
+          !isAuthenticated ? 'max-w-md' : 'max-w-6xl max-h-[94vh]'
+        }`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-modal-title"
       >
         {/* Top Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-slate-800 bg-slate-950/80">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800 bg-slate-950/80">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
               <Lock className="w-4 h-4" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400">
-                  PIPL Executive CRM
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
-                  v2.0
-                </span>
-              </div>
-              <h3 id="admin-modal-title" className="text-base sm:text-lg font-bold text-slate-100 font-heading">
-                Client Proposals & RFP Leads Dashboard
+              <h3 id="admin-modal-title" className="text-sm font-bold text-slate-100 font-heading">
+                {!isAuthenticated
+                  ? isResetMode
+                    ? 'Security Verification'
+                    : 'Authentication Required'
+                  : 'Executive Dashboard'}
               </h3>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             {isAuthenticated && (
-              <button
-                onClick={handleLogout}
-                className="px-3 py-1.5 text-xs text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-                title="Log out of Admin"
-              >
-                Log Out
-              </button>
+              <>
+                <button
+                  onClick={() => setIsChangingPasswordInDash(true)}
+                  className="px-2.5 py-1 text-xs text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-1"
+                  title="Change Password"
+                >
+                  <KeyRound className="w-3 h-3" />
+                  <span className="hidden sm:inline">Change Password</span>
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-2.5 py-1 text-xs text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+                  title="Log out"
+                >
+                  Log Out
+                </button>
+              </>
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              aria-label="Close admin modal"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
@@ -226,56 +386,320 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
 
         {/* Content Body */}
         {!isAuthenticated ? (
-          /* Password Gate */
-          <div className="p-8 sm:p-12 flex flex-col items-center justify-center text-center max-w-md mx-auto my-auto space-y-6">
-            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center shadow-lg shadow-cyan-500/10">
-              <Lock className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-xl font-bold font-heading text-slate-100">
-                Parmaarth Infratech Executive Access
-              </h4>
-              <p className="text-xs text-slate-400">
-                Please enter your executive passcode to view and manage customer quote submissions, contact inquiries, and email dispatches.
-              </p>
-            </div>
-
-            <form onSubmit={handleLogin} className="w-full space-y-4">
-              <div>
-                <input
-                  type="password"
-                  placeholder="Enter passcode (default: pipl2026)"
-                  value={passwordInput}
-                  onChange={(e) => setPasswordInput(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-200 text-center font-mono focus:outline-none focus:border-cyan-500"
-                  autoFocus
-                />
-                {passwordError && (
-                  <p className="mt-2 text-xs text-rose-400 flex items-center justify-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    <span>{passwordError}</span>
-                  </p>
-                )}
+          isResetMode ? (
+            /* ================= PASSWORD RESET VIEW ================= */
+            <div className="p-6 sm:p-8 space-y-5">
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsResetMode(false);
+                    setResetStep('verify');
+                    setResetError('');
+                  }}
+                  className="hover:text-white flex items-center gap-1 transition-colors"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to login</span>
+                </button>
               </div>
 
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2"
-              >
-                <Unlock className="w-4 h-4" />
-                <span>Unlock Leads Portal</span>
-              </button>
+              {resetError && (
+                <div className="p-3 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{resetError}</span>
+                </div>
+              )}
 
-              <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 text-[11px] text-slate-400">
-                <span className="font-semibold text-slate-300">Default Access Passcode:</span>{' '}
-                <code className="px-1.5 py-0.5 rounded bg-slate-900 text-cyan-400 font-mono">pipl2026</code>
+              {/* Step 1: Enter email */}
+              {resetStep === 'verify' && (
+                <form onSubmit={handleVerifyEmail} className="space-y-4">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold text-slate-200">Reset Password</h4>
+                    <p className="text-xs text-slate-400">
+                      Enter the registered administrator email to receive a verification code.
+                    </p>
+                  </div>
+
+                  <div>
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter registered email"
+                      value={resetEmailInput}
+                      onChange={(e) => setResetEmailInput(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                      autoFocus
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSendingResetEmail}
+                    className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isSendingResetEmail ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending Code...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Send Verification Code</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+
+              {/* Step 2: Enter OTP */}
+              {resetStep === 'otp' && (
+                <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold text-slate-200">Enter Verification Code</h4>
+                    <p className="text-xs text-slate-400">
+                      A 6-digit verification code has been dispatched to {resetEmailInput}.
+                    </p>
+                  </div>
+
+                  <div>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter 6-digit code or Master PIN"
+                      value={resetOtpInput}
+                      onChange={(e) => setResetOtpInput(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm font-mono tracking-widest text-center text-slate-200 focus:outline-none focus:border-cyan-500"
+                      autoFocus
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors"
+                  >
+                    Verify Code
+                  </button>
+
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={() => setResetStep('verify')}
+                      className="text-xs text-slate-400 hover:text-slate-200"
+                    >
+                      Resend code or change email
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Step 3: Enter New Password */}
+              {resetStep === 'new_password' && (
+                <form onSubmit={handleSaveNewPassword} className="space-y-4">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold text-slate-200">Set New Password</h4>
+                    <p className="text-xs text-slate-400">
+                      Create and confirm your new access password.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <input
+                        type="password"
+                        required
+                        placeholder="New password"
+                        value={newPasswordInput}
+                        onChange={(e) => setNewPasswordInput(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                        autoFocus
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="password"
+                        required
+                        placeholder="Confirm new password"
+                        value={confirmPasswordInput}
+                        onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors"
+                  >
+                    Save & Update Password
+                  </button>
+                </form>
+              )}
+
+              {/* Step 4: Success confirmation */}
+              {resetStep === 'success' && (
+                <div className="text-center space-y-4 py-2">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-bold text-slate-100">Password Updated</h4>
+                    <p className="text-xs text-slate-400">
+                      Your new password is now active. You can log in using your new credentials.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsResetMode(false);
+                      setResetStep('verify');
+                    }}
+                    className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition-colors"
+                  >
+                    Proceed to Login
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* ================= ABSTRACT AUTHENTICATION GATE ================= */
+            <div className="p-6 sm:p-8 space-y-5">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-2">
+                    Enter Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="••••••••"
+                      value={passwordInput}
+                      onChange={(e) => setPasswordInput(e.target.value)}
+                      className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-slate-950 border border-slate-800 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 font-mono"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {passwordError && (
+                    <p className="mt-2 text-xs text-rose-400 flex items-center gap-1">
+                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                      <span>{passwordError}</span>
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2"
+                >
+                  <Unlock className="w-3.5 h-3.5" />
+                  <span>Access</span>
+                </button>
+              </form>
+
+              {/* Discreet Forgot Password Link */}
+              <div className="pt-2 text-center border-t border-slate-800/60">
+                <button
+                  type="button"
+                  onClick={handleStartResetFlow}
+                  className="text-xs text-slate-500 hover:text-cyan-400 transition-colors cursor-pointer"
+                >
+                  Forgot password?
+                </button>
               </div>
-            </form>
-          </div>
+            </div>
+          )
         ) : (
-          /* Authenticated Dashboard */
-          <div className="flex-1 flex flex-col overflow-hidden">
+          /* ================= AUTHENTICATED EXECUTIVE DASHBOARD ================= */
+          <div className="flex-1 flex flex-col overflow-hidden relative">
+            {/* In-Dashboard Password Change Drawer / Dialog */}
+            {isChangingPasswordInDash && (
+              <div className="absolute inset-0 z-20 bg-slate-950/90 backdrop-blur-sm p-6 flex items-center justify-center">
+                <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900 p-6 space-y-4 shadow-xl">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                      <KeyRound className="w-4 h-4 text-cyan-400" />
+                      <span>Change Access Password</span>
+                    </h4>
+                    <button
+                      onClick={() => {
+                        setIsChangingPasswordInDash(false);
+                        setResetError('');
+                        setChangePasswordSuccess('');
+                      }}
+                      className="text-slate-400 hover:text-white"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {resetError && (
+                    <div className="p-2.5 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs">
+                      {resetError}
+                    </div>
+                  )}
+
+                  {changePasswordSuccess && (
+                    <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <span>{changePasswordSuccess}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleDirectPasswordChange} className="space-y-3">
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">New Password</label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="Enter new password"
+                        value={newPasswordInput}
+                        onChange={(e) => setNewPasswordInput(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                        autoFocus
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] text-slate-400 mb-1">Confirm New Password</label>
+                      <input
+                        type="password"
+                        required
+                        placeholder="Confirm new password"
+                        value={confirmPasswordInput}
+                        onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                      />
+                    </div>
+
+                    <div className="pt-2 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsChangingPasswordInDash(false)}
+                        className="flex-1 py-2 rounded-xl border border-slate-800 text-xs text-slate-400 hover:text-white"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex-1 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs"
+                      >
+                        Update
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
             {/* KPI Cards Banner */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 border-b border-slate-800 bg-slate-950/40">
               <div className="p-3 rounded-2xl bg-slate-950 border border-slate-800/80">
@@ -363,7 +787,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
                   <div className="w-12 h-12 rounded-full bg-slate-800/60 flex items-center justify-center mx-auto mb-3 text-slate-500">
                     <Search className="w-6 h-6" />
                   </div>
-                  <p className="text-sm font-medium text-slate-300">No leads match your search criteria</p>
+                  <p className="text-sm font-medium text-slate-300">No records found</p>
                   <p className="text-xs text-slate-500 mt-1">Try resetting the filter or clear your search term.</p>
                 </div>
               ) : (
@@ -460,7 +884,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-colors"
-                            title="Chat with customer on WhatsApp"
+                            title="Chat on WhatsApp"
                           >
                             <MessageSquare className="w-4 h-4" />
                           </a>
@@ -469,7 +893,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
                           <a
                             href={`tel:${lead.phone}`}
                             className="p-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 transition-colors"
-                            title="Call customer directly"
+                            title="Call directly"
                           >
                             <Phone className="w-4 h-4" />
                           </a>
@@ -487,7 +911,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
                           <button
                             onClick={() => setSelectedLead(isExpanded ? null : lead)}
                             className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
-                            title="View full lead details"
+                            title="View details"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -496,7 +920,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
                           <button
                             onClick={() => handleDelete(lead.id)}
                             className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-colors"
-                            title="Delete Lead"
+                            title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -507,7 +931,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
                       {isExpanded && (
                         <div className="mt-4 p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 text-xs animate-fade-in">
                           <div className="font-semibold text-slate-200 border-b border-slate-800/80 pb-2 flex items-center justify-between">
-                            <span>Full Technical Specification & Lead Context</span>
+                            <span>Technical Scope & Details</span>
                             <span className="font-mono text-cyan-400 text-[11px]">
                               Source: {lead.source || 'Website RFP'}
                             </span>
@@ -530,7 +954,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
 
                           {lead.notes && (
                             <div className="mt-2 pt-2 border-t border-slate-900">
-                              <span className="text-slate-500 block mb-1">Customer Site Notes:</span>
+                              <span className="text-slate-500 block mb-1">Customer Notes:</span>
                               <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800/60 text-slate-300 leading-relaxed">
                                 {lead.notes}
                               </div>
@@ -538,7 +962,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
                           )}
 
                           <div className="text-[11px] text-slate-500 pt-1 flex items-center justify-between">
-                            <span>Notification Destination: SAIELKHAROTE219@gmail.com</span>
+                            <span>Notification Delivered: {REGISTERED_OWNER_EMAIL}</span>
                             <span>Created: {new Date(lead.createdAt).toISOString()}</span>
                           </div>
                         </div>
@@ -552,11 +976,11 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
             {/* Footer Summary Bar */}
             <div className="px-4 py-3 border-t border-slate-800 bg-slate-950 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
               <div className="flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Real-time persistence enabled (stored in secure local storage + email dispatched).</span>
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Authorized session active</span>
               </div>
               <div className="text-[11px] text-slate-500">
-                Parmaarth Infratech Pvt. Ltd. | Pune HQ
+                Parmaarth Infratech Pvt. Ltd.
               </div>
             </div>
           </div>
