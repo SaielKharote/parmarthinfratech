@@ -55,11 +55,11 @@ export default function App() {
       {/* Sleek, simple, slow-motion dynamic wallpaper background */}
       <LiveBackground />
 
+      {/* Topmost Slim Clientele & Strategic Partners Strip (Above Header) */}
+      <ClienteleTicker />
+
       {/* Top Bar Navigation */}
       <Navbar onOpenQuoteModal={() => handleOpenQuoteModal()} />
-
-      {/* Topmost Moving Clientele & Strategic Partners Strip */}
-      <ClienteleTicker />
 
       {/* Main Content Sections */}
       <main>
