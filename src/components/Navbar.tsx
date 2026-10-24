@@ -20,35 +20,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
         {/* Zone 2: Navigation Links */}
         <nav className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-medium">
           <a
-            href="#subsidy"
+            href="#divisions"
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
           >
-            Solar Subsidy
+            Divisions
           </a>
           <a
-            href="#calculator"
+            href="#services"
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
           >
-            Bill Calculator
-          </a>
-          <a
-            href="#instagram-feed"
-            className="text-slate-300 hover:text-rose-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8 flex items-center gap-1.5"
-          >
-            <Instagram className="w-3.5 h-3.5 text-rose-400" />
-            <span>Instagram</span>
-          </a>
-          <a
-            href="#3d-twin"
-            className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
-          >
-            3D Equipment
-          </a>
-          <a
-            href="#solutions"
-            className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
-          >
-            Services
+            Key Services
           </a>
           <a
             href="#projects"
@@ -56,25 +37,32 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
           >
             Projects
           </a>
+          <a
+            href="#3d-twin"
+            className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
+          >
+            3D Tech
+          </a>
+          <a
+            href="#calculator"
+            className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
+          >
+            Solar Calculator
+          </a>
+          <a
+            href="#instagram-feed"
+            className="text-slate-300 hover:text-rose-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8 flex items-center gap-1.5"
+          >
+            <Instagram className="w-3.5 h-3.5 text-rose-400" />
+            <span>Field Photos</span>
+          </a>
         </nav>
 
         {/* Zone 3: Direct Actions & Quote CTA */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Instagram quick link */}
-          <a
-            href="https://www.instagram.com/parmaarthinfratechpvt/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold transition-colors"
-            title="Follow @parmaarthinfratechpvt on Instagram"
-          >
-            <Instagram className="w-3.5 h-3.5" />
-            <span>@parmaarthinfratechpvt</span>
-          </a>
-
           {/* Quick WhatsApp button */}
           <a
-            href="https://wa.me/917666121210?text=Hello%20Parmaarth%20Infratech,%20I%20am%20interested%20in%20solar%20rooftop%20installation"
+            href="https://wa.me/917666121210?text=Hello%20Parmaarth%20Infratech,%20we%20have%20an%20infrastructure%20and%20engineering%20requirement"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition-colors"
@@ -89,7 +77,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
             onClick={onOpenQuoteModal}
             className="px-3.5 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-colors shadow-sm whitespace-nowrap shrink-0"
           >
-            <span className="hidden sm:inline">Get Free </span>Quote
+            <span>Request RFP</span>
           </button>
 
           {/* Mobile menu button */}
@@ -107,18 +95,39 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-800 bg-slate-950 px-4 py-4 space-y-3">
           <a
-            href="#subsidy"
+            href="#divisions"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
           >
-            Solar Subsidy (योजना)
+            Three Core Divisions (Civil, Electrical, Renewable)
+          </a>
+          <a
+            href="#services"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
+          >
+            Key Services (Civil, Roads, Electrical, AMI, Solar, O&M)
+          </a>
+          <a
+            href="#projects"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
+          >
+            Notable Landmark Projects
+          </a>
+          <a
+            href="#3d-twin"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
+          >
+            3D Equipment & Substation View
           </a>
           <a
             href="#calculator"
             onClick={() => setMobileMenuOpen(false)}
             className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
           >
-            Bill Savings Calculator
+            Solar Savings & ROI Calculator
           </a>
           <a
             href="#instagram-feed"
@@ -126,40 +135,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
             className="block text-sm font-medium text-rose-400 hover:text-rose-300 py-1 flex items-center gap-2"
           >
             <Instagram className="w-4 h-4" />
-            <span>Live Instagram Feed (@parmaarthinfratechpvt)</span>
-          </a>
-          <a
-            href="#3d-twin"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
-          >
-            3D Equipment View
-          </a>
-          <a
-            href="#solutions"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
-          >
-            Services & Contracting
-          </a>
-          <a
-            href="#projects"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
-          >
-            Notable Projects
+            <span>Live Field Photos (@parmaarthinfratechpvt)</span>
           </a>
 
           <div className="pt-2 flex flex-col gap-2">
-            <a
-              href="https://www.instagram.com/parmaarthinfratechpvt/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-2.5 text-xs font-semibold rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white flex items-center justify-center gap-2"
-            >
-              <Instagram className="w-4 h-4" />
-              <span>Follow @parmaarthinfratechpvt</span>
-            </a>
             <a
               href="https://wa.me/917666121210?text=Hello%20Parmaarth%20Infratech"
               target="_blank"
@@ -176,7 +155,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
               }}
               className="w-full py-2.5 text-xs font-semibold rounded-lg bg-cyan-500 text-slate-950 font-bold"
             >
-              Get Free Quote
+              Request Project RFP
             </button>
           </div>
         </div>

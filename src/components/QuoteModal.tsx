@@ -15,7 +15,7 @@ interface QuoteModalProps {
 export const QuoteModal: React.FC<QuoteModalProps> = ({
   isOpen,
   onClose,
-  initialDivision = 'Renewable Energy & Solar EPC',
+  initialDivision = 'Civil Infrastructure & Structural Works',
   initialNotes = '',
   theme = 'dark',
 }) => {
@@ -23,7 +23,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
 
   const [division, setDivision] = useState(initialDivision);
   const [sector, setSector] = useState('Industrial / C&I');
-  const [projectScale, setProjectScale] = useState('100 kW to 500 kW');
+  const [projectScale, setProjectScale] = useState('₹10M to ₹50 Million (₹1 - ₹5 Cr)');
   const [location, setLocation] = useState('Pune & PCMC, Maharashtra');
   const [fullName, setFullName] = useState('');
   const [company, setCompany] = useState('');
@@ -225,14 +225,15 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
                   onChange={(e) => setDivision(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                 >
-                  <option value="Renewable Energy & Solar EPC">Renewable Energy & Solar EPC</option>
+                  <option value="Civil Infrastructure & Structural Works">Civil Infrastructure & Structural Works</option>
+                  <option value="Roads, Bridges & Municipal Infrastructure">Roads, Bridges & Municipal Infrastructure</option>
+                  <option value="Electrical Infrastructure & Substations">Electrical Infrastructure & Substations (33kV/11kV)</option>
+                  <option value="Smart Metering & AMI">Smart Metering & AMI</option>
+                  <option value="Renewable Energy & Solar EPC">Renewable Energy & Solar EPC (MW / C&I)</option>
+                  <option value="O&M Lifecycle Maintenance">O&M Lifecycle Maintenance</option>
                   <option value="Green Open Access (100kW+)">Green Open Access (100kW+)</option>
                   <option value="Virtual Net Metering (CHS)">Virtual Net Metering (CHS)</option>
-                  <option value="Electrical Infrastructure & Substations">Electrical Infrastructure & Substations</option>
-                  <option value="Smart Metering & AMI">Smart Metering & AMI</option>
-                  <option value="Civil & Structural Works">Civil & Structural Works</option>
                   <option value="EV Charging Infrastructure">EV Charging Infrastructure</option>
-                  <option value="O&M Lifecycle Maintenance">O&M Lifecycle Maintenance</option>
                 </select>
               </div>
 
@@ -245,10 +246,10 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
                   onChange={(e) => setSector(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                 >
-                  <option value="Industrial / C&I">Industrial / Commercial (C&I)</option>
-                  <option value="Government / Municipal">Government Department / Municipal</option>
+                  <option value="Government / Municipal">Government Department / Municipal (PCMC/PMC/PWD)</option>
+                  <option value="Industrial / C&I">Industrial / Commercial (C&I / Factories)</option>
+                  <option value="Infrastructure Developer">Infrastructure Developer / General Contractor</option>
                   <option value="Housing Society (CHS)">Cooperative Housing Society (CHS)</option>
-                  <option value="Infrastructure Developer">Infrastructure Developer / Contractor</option>
                 </select>
               </div>
             </div>
@@ -256,19 +257,19 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Project Capacity / Scale
+                  Project Capacity / Scope
                 </label>
                 <select
                   value={projectScale}
                   onChange={(e) => setProjectScale(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                 >
-                  <option value="Under 50 kW">Under 50 kW / Small Commercial</option>
-                  <option value="50 kW to 100 kW">50 kW to 100 kW</option>
-                  <option value="100 kW to 500 kW">100 kW to 500 kW (Green Open Access ready)</option>
-                  <option value="500 kW to 2 MW">500 kW to 2 MW (Industrial Scale)</option>
-                  <option value="2 MW+ Utility Mega Project">2 MW+ Utility / Turnkey EPC</option>
-                  <option value="Civil Infrastructure Package">Civil Infrastructure Package</option>
+                  <option value="Under ₹10 Million (< ₹1 Cr)">Under ₹10 Million (&lt; ₹1 Cr) / Fast-Track Scope</option>
+                  <option value="₹10M to ₹50 Million (₹1 - ₹5 Cr)">₹10M to ₹50 Million (₹1 - ₹5 Cr)</option>
+                  <option value="₹50M to ₹150 Million (₹5 - ₹15 Cr)">₹50M to ₹150 Million (₹5 - ₹15 Cr)</option>
+                  <option value="₹150 Million+ Landmark EPC">₹150 Million+ (&gt; ₹15 Cr) Landmark EPC</option>
+                  <option value="100 kW to 2 MW Solar Capacity">100 kW to 2 MW Solar / Renewable</option>
+                  <option value="Annual O&M / Maintenance Contract">Annual O&M / Maintenance Contract</option>
                 </select>
               </div>
 

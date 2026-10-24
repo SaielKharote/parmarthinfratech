@@ -109,12 +109,12 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal, onOpenAdminMod
               Core Divisions
             </h4>
             <ul className="space-y-2.5 text-slate-400">
-              <li>Renewable Solar EPC (MW & Rooftop)</li>
-              <li>Green Open Access (from 100 kW)</li>
-              <li>Virtual Net Metering (CHS)</li>
-              <li>Substations & HT/LT Cabling</li>
+              <li>Civil & Structural Works (RCC & PEB)</li>
+              <li>Roads, Bridges & Corridors</li>
+              <li>Electrical Substations & HT/LT Cabling</li>
               <li>Smart Metering / AMI Infrastructure</li>
-              <li>EV Fast Charging Monoliths</li>
+              <li>Renewable Solar EPC (MW & C&I)</li>
+              <li>Turnkey O&M Asset Management</li>
             </ul>
           </div>
 
