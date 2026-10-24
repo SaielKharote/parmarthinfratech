@@ -5,16 +5,16 @@ import { Hero } from './components/Hero';
 import { OrganizationSection } from './components/OrganizationSection';
 import { ServicesSection } from './components/ServicesSection';
 import { ProjectsSection } from './components/ProjectsSection';
-import { ModelViewer } from './components/ModelViewer3D/ModelViewer';
-import { CertificationsSection } from './components/CertificationsSection';
+import { LazyModelViewer } from './components/ModelViewer3D/LazyModelViewer';
 import { HseSection } from './components/HseSection';
+import { InstagramSection } from './components/InstagramSection';
+import { CertificationsSection } from './components/CertificationsSection';
 import { EnergyCalculator } from './components/EnergyCalculator';
 import { SubsidySection } from './components/SubsidySection';
-import { InstagramSection } from './components/InstagramSection';
 import { Footer } from './components/Footer';
 import { QuoteModal } from './components/QuoteModal';
 import { AdminModal } from './components/AdminModal';
-import { Box, SunMedium, Zap, ShieldCheck } from 'lucide-react';
+import { Box } from 'lucide-react';
 
 export default function App() {
   const [selected3DModel, setSelected3DModel] = useState<'solar' | 'meter' | 'transformer' | 'ev'>('transformer');
@@ -66,19 +66,33 @@ export default function App() {
         />
 
         {/* 2. Organization Structure & 3 Core Divisions (Civil, Electrical, Renewable) */}
-        <OrganizationSection onOpenQuoteModal={handleOpenQuoteModal} />
+        <div className="optimize-rendering">
+          <OrganizationSection onOpenQuoteModal={handleOpenQuoteModal} />
+        </div>
 
         {/* 3. The 6 Key Services (Civil & Structural, Roads & Bridges, Electrical, Smart Metering, Solar, O&M) */}
-        <ServicesSection
-          onSelectModel={(m) => {
-            setSelected3DModel(m);
-            document.getElementById('3d-twin')?.scrollIntoView({ behavior: 'smooth' });
-          }}
-          onOpenQuoteModal={handleOpenQuoteModal}
-        />
+        <div className="optimize-rendering">
+          <ServicesSection
+            onSelectModel={(m) => {
+              setSelected3DModel(m);
+              document.getElementById('3d-twin')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            onOpenQuoteModal={handleOpenQuoteModal}
+          />
+        </div>
 
-        {/* 4. Interactive 3D Equipment & Substation Viewport */}
-        <section id="3d-twin" className="py-14 md:py-24 border-t border-slate-800/80 scroll-mt-20">
+        {/* 4. Notable Execution Projects (PCMC Administrative Building, Adani AMI, Finolex, Ranjangaon, WTP) */}
+        <div className="optimize-rendering">
+          <ProjectsSection
+            onSelectProjectForRFP={(project) => {
+              setQuoteNotes(`Inquiry regarding project scope & execution similar to: ${project}`);
+              setIsQuoteOpen(true);
+            }}
+          />
+        </div>
+
+        {/* 5. Interactive 3D Equipment & Substation Viewport */}
+        <section id="3d-twin" className="py-14 md:py-24 border-t border-slate-800/80 scroll-mt-20 optimize-rendering">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 sm:gap-6 mb-6 sm:mb-8">
               <div>
@@ -140,7 +154,7 @@ export default function App() {
             </div>
 
             {/* 3D Model Viewer Canvas */}
-            <ModelViewer
+            <LazyModelViewer
               key={selected3DModel}
               initialModel={selected3DModel}
               theme="dark"
@@ -151,31 +165,29 @@ export default function App() {
           </div>
         </section>
 
-        {/* 5. Notable Landmark Projects (PCMC Administrative Building, Adani AMI, Finolex, Ranjangaon, WTP) */}
-        <ProjectsSection
-          onSelectProjectForRFP={(project) => {
-            setQuoteNotes(`Inquiry regarding project scope & execution similar to: ${project}`);
-            setIsQuoteOpen(true);
-          }}
-        />
+        {/* 6. HSE Implementation at Project (Field Safety Photos) */}
+        <div className="optimize-rendering">
+          <HseSection />
+        </div>
 
-        {/* 6. Certifications & Major Client Partnerships (Adani, Mahindra, L&T, PCMC, ISO 9001:2015) */}
-        <CertificationsSection />
+        {/* 7. Live Field Photos & Social Updates (@parmaarthinfratechpvt) */}
+        <div className="optimize-rendering">
+          <InstagramSection />
+        </div>
 
-        {/* 7. Safety & Rigor (HSE Protocols) */}
-        <HseSection />
+        {/* 8. Certifications & Major Client Partnerships (Adani, Mahindra, L&T, PCMC, ISO 9001:2015) */}
+        <div className="optimize-rendering">
+          <CertificationsSection />
+        </div>
 
-        {/* 8. Dedicated Energy Solutions & Subsidy Sizing Module */}
-        <div className="relative">
+        {/* 9. Dedicated Energy Solutions & Subsidy Sizing Module */}
+        <div className="relative optimize-rendering">
           {/* Energy Calculator */}
           <EnergyCalculator onOpenQuoteWithDetails={handleOpenQuoteWithDetails} />
 
           {/* Maharashtra & National Solar Subsidy Framework */}
           <SubsidySection onOpenQuoteModal={handleOpenQuoteModal} />
         </div>
-
-        {/* 9. Live Instagram Feed (@parmaarthinfratechpvt) */}
-        <InstagramSection />
       </main>
 
       {/* Footer */}
