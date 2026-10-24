@@ -1,0 +1,6 @@
+{
+  "name": "PIPL - Parmaarth Infratech | Next-Gen Infrastructure & 3D Visualizer",
+  "description": "High-tech interactive 3D digital twins and engineering platform for Parmaarth Infratech Pvt. Ltd. (PIPL) - Civil, Electrical EPC, Renewable Energy, and Smart Metering Infrastructure.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
