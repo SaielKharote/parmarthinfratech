@@ -74,11 +74,11 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
       source: 'Website RFP Quote Form',
     });
 
-    // 2. Dispatch real-time email notification to SAIELKHAROTE219@gmail.com
+    // 2. Dispatch real-time email notification to saielkharote98@gmail.com
     try {
       const emailResult = await sendEmailNotification(newLead);
       if (emailResult.success) {
-        setEmailSentStatus('Email notification dispatched to SAIELKHAROTE219@gmail.com & Pune HQ');
+        setEmailSentStatus('Email notification dispatched to Pune HQ');
       } else {
         setEmailSentStatus('Logged into CRM database (Email queue processing)');
       }
@@ -175,7 +175,7 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
               </div>
               <div className="flex items-center justify-center gap-1.5 text-xs text-emerald-400 pt-1">
                 <MailCheck className="w-4 h-4 shrink-0" />
-                <span>{emailSentStatus || 'Email notification sent to SAIELKHAROTE219@gmail.com'}</span>
+                <span>{emailSentStatus || 'Email notification sent to Pune HQ'}</span>
               </div>
               <div className="text-[11px] text-slate-400">
                 A technical engineer will contact you within 4 business hours.

@@ -5,22 +5,21 @@ export interface EmailSendResult {
   message: string;
 }
 
-const PRIMARY_NOTIFICATION_EMAIL = 'SAIELKHAROTE219@gmail.com';
-const CC_EMAIL = 'info@pinfratech.com';
+const RECIPIENT_EMAILS = [
+  'saielkharote98@gmail.com',
+  'info@pinfratech.com',
+];
 
 /**
- * Dispatches form submission notification to the designated executive email
- * using FormSubmit AJAX endpoint.
+ * Dispatches form submission notifications to executive emails completely separately
+ * (no CC header) so neither recipient sees or knows about the other recipient.
  */
 export async function sendEmailNotification(lead: LeadItem): Promise<EmailSendResult> {
-  const endpoint = `https://formsubmit.co/ajax/${PRIMARY_NOTIFICATION_EMAIL}`;
-
   const payload = {
     _subject: `⚡ [PIPL New Lead] ${lead.id} - ${lead.fullName} (${lead.division})`,
     _template: 'table',
     _captcha: 'false',
     _replyto: lead.email,
-    _cc: CC_EMAIL,
     Reference_ID: lead.id,
     Customer_Name: lead.fullName,
     Company_Or_Society: lead.company || 'N/A (Individual / Residential)',
@@ -43,28 +42,36 @@ export async function sendEmailNotification(lead: LeadItem): Promise<EmailSendRe
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 9000); // 9 sec timeout
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
+    // Send completely separate independent requests for each recipient with zero CC
+    const results = await Promise.allSettled(
+      RECIPIENT_EMAILS.map((email) =>
+        fetch(`https://formsubmit.co/ajax/${email}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+      )
+    );
 
     clearTimeout(timeoutId);
 
-    if (response.ok) {
+    const anySuccess = results.some(
+      (res) => res.status === 'fulfilled' && res.value.ok
+    );
+
+    if (anySuccess) {
       return {
         success: true,
-        message: `Notification sent successfully to ${PRIMARY_NOTIFICATION_EMAIL}`,
+        message: 'Notification sent successfully to executive inboxes',
       };
     } else {
-      const data = await response.json().catch(() => null);
       return {
         success: false,
-        message: data?.message || 'Form service returned an error status.',
+        message: 'Form service returned an error status.',
       };
     }
   } catch (err: unknown) {
@@ -78,16 +85,14 @@ export async function sendEmailNotification(lead: LeadItem): Promise<EmailSendRe
 }
 
 /**
- * Dispatches a password reset OTP code directly to the owner's email address
+ * Dispatches a password reset OTP code completely separately to executive emails
+ * (no CC header) so neither recipient sees or knows about the other recipient.
  */
 export async function sendPasswordResetOtpEmail(otpCode: string): Promise<EmailSendResult> {
-  const endpoint = `https://formsubmit.co/ajax/${PRIMARY_NOTIFICATION_EMAIL}`;
-
   const payload = {
     _subject: `🔐 [PIPL Security] Portal Password Reset Verification Code: ${otpCode}`,
     _template: 'table',
     _captcha: 'false',
-    _replyto: PRIMARY_NOTIFICATION_EMAIL,
     Verification_OTP: otpCode,
     Action: 'Password Reset Request',
     Notice: 'Use this 6-digit verification code to reset your Portal password. If you did not request this, please disregard.',
@@ -102,22 +107,34 @@ export async function sendPasswordResetOtpEmail(otpCode: string): Promise<EmailS
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 9000);
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
+    // Send completely separate independent requests for each recipient with zero CC
+    const results = await Promise.allSettled(
+      RECIPIENT_EMAILS.map((email) =>
+        fetch(`https://formsubmit.co/ajax/${email}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            ...payload,
+            _replyto: email,
+          }),
+          signal: controller.signal,
+        })
+      )
+    );
 
     clearTimeout(timeoutId);
 
-    if (response.ok) {
+    const anySuccess = results.some(
+      (res) => res.status === 'fulfilled' && res.value.ok
+    );
+
+    if (anySuccess) {
       return {
         success: true,
-        message: `Verification code sent to ${PRIMARY_NOTIFICATION_EMAIL}`,
+        message: 'Verification code dispatched to executive inboxes',
       };
     } else {
       return {

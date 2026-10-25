@@ -39,7 +39,7 @@ interface AdminModalProps {
 }
 
 const DEFAULT_MASTER_PASSCODE = 'pipl2026';
-const REGISTERED_OWNER_EMAIL = 'saielkharote219@gmail.com';
+const REGISTERED_OWNER_EMAIL = 'saielkharote98@gmail.com';
 const STORAGE_CUSTOM_PASS = 'pipl_admin_custom_password';
 
 export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
@@ -138,7 +138,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
     const cleanEmail = resetEmailInput.trim().toLowerCase();
 
     // Check if entered email matches the authorized owner email or master keyword
-    if (cleanEmail !== REGISTERED_OWNER_EMAIL && cleanEmail !== 'saielkharote219@gmail.com') {
+    if (cleanEmail !== REGISTERED_OWNER_EMAIL && cleanEmail !== 'saielkharote98@gmail.com' && cleanEmail !== 'info@pinfratech.com') {
       setResetError('Email address does not match registered administrator profile.');
       return;
     }
