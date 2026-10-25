@@ -188,13 +188,13 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
                 Want immediate priority review? Forward this directly to our desk on WhatsApp:
               </div>
               <a
-                href={`https://wa.me/917666121210?text=${waLeadText}`}
+                href={`https://wa.me/919359543323?text=${waLeadText}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/20"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>Forward via WhatsApp (+91 76661 21210)</span>
+                <span>Forward via WhatsApp (+91 93595 43323)</span>
               </a>
             </div>
 

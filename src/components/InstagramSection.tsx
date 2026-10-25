@@ -59,7 +59,7 @@ Key Highlights:
 • Up to 90% savings on monthly power bills
 • End-to-end subsidy documentation managed by PIPL
 
-DM us or call +91 76661 21210 to book your free rooftop shadow analysis survey!`,
+DM us or call +91 93595 43323 to book your free rooftop shadow analysis survey!`,
       tags: ['#solarenergy', '#pune', '#punebusiness', '#mahavitaran', '#cleanpower', '#pmsuryaghar', '#parmaarthinfratech'],
       instagramUrl: 'https://www.instagram.com/parmaarthinfratechpvt/',
     },
@@ -126,7 +126,7 @@ Empowering factories, agricultural tracts, and commercial establishments with ca
 • २५ वर्षांची पॅनेल वॉरंटी
 • महावितरण अधिकृत व्हेंडर: परमार्थ इन्फ्राटेक प्रा. लि.
 
-नोंदणीसाठी त्वरित संपर्क साधा: +91 76661 21210 / +91 93595 43323`,
+नोंदणीसाठी त्वरित संपर्क साधा: +91 93595 43323`,
       tags: ['#mahavitaran', '#solarsubsidy', '#pmsuryagharyojana', '#maharashtra', '#saveelectricity', '#solarforhome', '#pune'],
       instagramUrl: 'https://www.instagram.com/parmaarthinfratechpvt/',
     },
@@ -662,7 +662,7 @@ Empowering factories, agricultural tracts, and commercial establishments with ca
                   </a>
 
                   <a
-                    href="https://wa.me/917666121210?text=Hello%20PIPL,%20I%20saw%20your%20Instagram%20post%20about%20solar%20installation"
+                    href="https://wa.me/919359543323?text=Hello%20PIPL,%20I%20saw%20your%20Instagram%20post%20about%20solar%20installation"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-1.5"

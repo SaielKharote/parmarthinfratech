@@ -62,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Quick WhatsApp button */}
           <a
-            href="https://wa.me/917666121210?text=Hello%20Parmaarth%20Infratech,%20we%20have%20an%20infrastructure%20and%20engineering%20requirement"
+            href="https://wa.me/919359543323?text=Hello%20Parmaarth%20Infratech,%20we%20have%20an%20infrastructure%20and%20engineering%20requirement"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold transition-colors"
@@ -140,13 +140,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
 
           <div className="pt-2 flex flex-col gap-2">
             <a
-              href="https://wa.me/917666121210?text=Hello%20Parmaarth%20Infratech"
+              href="https://wa.me/919359543323?text=Hello%20Parmaarth%20Infratech"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-2.5 text-xs font-semibold rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center gap-2"
             >
               <Phone className="w-4 h-4" />
-              <span>WhatsApp: +91 76661 21210</span>
+              <span>WhatsApp: +91 93595 43323</span>
             </a>
             <button
               onClick={() => {

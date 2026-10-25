@@ -140,13 +140,13 @@ export const Hero: React.FC<HeroProps> = ({
               </button>
 
               <a
-                href="https://wa.me/917666121210?text=Hello%20Parmaarth%20Infratech,%20we%20have%20an%20infrastructure%20and%20engineering%20requirement"
+                href="https://wa.me/919359543323?text=Hello%20Parmaarth%20Infratech,%20we%20have%20an%20infrastructure%20and%20engineering%20requirement"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 px-5 py-3 text-xs font-semibold rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 transition-colors"
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>WhatsApp: +91 76661 21210</span>
+                <span>WhatsApp: +91 93595 43323</span>
               </a>
 
               <a

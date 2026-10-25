@@ -143,13 +143,13 @@ export const SubsidySection: React.FC<SubsidySectionProps> = ({
               {/* Action Buttons */}
               <div className="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <a
-                  href="https://wa.me/917666121210?text=Hello%20PIPL,%20I%20want%20to%20apply%20for%20Solar%20Subsidy%20under%20PM%20Surya%20Ghar%20Yojana"
+                  href="https://wa.me/919359543323?text=Hello%20PIPL,%20I%20want%20to%20apply%20for%20Solar%20Subsidy%20under%20PM%20Surya%20Ghar%20Yojana"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
                 >
                   <Phone className="w-4 h-4" />
-                  <span>WhatsApp Apply: +91 76661 21210</span>
+                  <span>WhatsApp Apply: +91 93595 43323</span>
                 </a>
 
                 <button

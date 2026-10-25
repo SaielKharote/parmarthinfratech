@@ -290,7 +290,7 @@ export const EnergyCalculator: React.FC<EnergyCalculatorProps> = ({
             {/* Actions */}
             <div className="mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <a
-                href={`https://wa.me/917666121210?text=Hello%20PIPL,%20my%20monthly%20electricity%20bill%20is%20Rs%20${monthlyBill},%20please%20send%20me%20a%20solar%20estimate`}
+                href={`https://wa.me/919359543323?text=Hello%20PIPL,%20my%20monthly%20electricity%20bill%20is%20Rs%20${monthlyBill},%20please%20send%20me%20a%20solar%20estimate`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
