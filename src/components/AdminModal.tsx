@@ -27,6 +27,7 @@ import {
 import {
   LeadItem,
   getLeads,
+  subscribeToLeads,
   updateLeadStatus,
   deleteLead,
   exportLeadsToCSV
@@ -77,12 +78,18 @@ export const AdminModal: React.FC<AdminModalProps> = ({ isOpen, onClose }) => {
   const [isChangingPasswordInDash, setIsChangingPasswordInDash] = useState(false);
   const [changePasswordSuccess, setChangePasswordSuccess] = useState('');
 
-  // Load leads on open
+  // Load leads on open & subscribe to real-time Firestore updates
   useEffect(() => {
     if (isOpen) {
       setLeads(getLeads());
       setPasswordError('');
       setResetError('');
+
+      const unsubscribe = subscribeToLeads((updatedLeads) => {
+        setLeads(updatedLeads);
+      });
+
+      return () => unsubscribe();
     }
   }, [isOpen]);
 

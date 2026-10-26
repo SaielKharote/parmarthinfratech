@@ -1,3 +1,16 @@
+import { 
+  collection, 
+  doc, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc, 
+  onSnapshot, 
+  getDocs,
+  query,
+  orderBy
+} from 'firebase/firestore';
+import { db } from '../firebase';
+
 export interface LeadItem {
   id: string;
   createdAt: string;
@@ -16,11 +29,29 @@ export interface LeadItem {
 
 const STORAGE_KEY = 'pipl_rfp_leads_v1';
 
-// Seed sample leads for immediate demonstration in the Admin Portal
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    operationType,
+    path,
+  };
+  console.error('Firestore Error:', JSON.stringify(errInfo));
+}
+
+// Seed sample leads for immediate demonstration if collection is empty
 const INITIAL_SEED_LEADS: LeadItem[] = [
   {
     id: 'PIPL-RFP-2026-1082',
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(), // 2 hours ago
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
     fullName: 'Sunil Deshmukh',
     company: 'Finolex Industries Plant Unit-2',
     phone: '+91 98220 44120',
@@ -35,7 +66,7 @@ const INITIAL_SEED_LEADS: LeadItem[] = [
   },
   {
     id: 'PIPL-RFP-2026-1049',
-    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(), // 1 day ago
+    createdAt: new Date(Date.now() - 3600000 * 24).toISOString(),
     fullName: 'Aniket Kulkarni',
     company: 'Green Woods CHS Pune',
     phone: '+91 94225 18765',
@@ -50,7 +81,7 @@ const INITIAL_SEED_LEADS: LeadItem[] = [
   },
   {
     id: 'PIPL-RFP-2026-1015',
-    createdAt: new Date(Date.now() - 3600000 * 48).toISOString(), // 2 days ago
+    createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
     fullName: 'Mahesh Patil',
     company: 'Patil Cold Storage & Logistics',
     phone: '+91 93701 55901',
@@ -65,7 +96,10 @@ const INITIAL_SEED_LEADS: LeadItem[] = [
   },
 ];
 
-export function getLeads(): LeadItem[] {
+// In-memory leads cache initialized from localStorage if available
+let cachedLeads: LeadItem[] = [];
+
+function loadLocalStorageLeads(): LeadItem[] {
   if (typeof window === 'undefined') return INITIAL_SEED_LEADS;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -81,8 +115,81 @@ export function getLeads(): LeadItem[] {
   }
 }
 
+cachedLeads = loadLocalStorageLeads();
+
+function saveLocalStorageLeads(leads: LeadItem[]) {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+    } catch (err) {
+      console.error('Failed to write leads to localStorage:', err);
+    }
+  }
+}
+
+/**
+ * Subscribe to real-time Firestore database updates for all enquiry leads.
+ * Automatically synchronizes changes across all devices and server restarts.
+ */
+export function subscribeToLeads(onUpdate: (leads: LeadItem[]) => void): () => void {
+  const leadsPath = 'leads';
+  try {
+    const leadsCollectionRef = collection(db, leadsPath);
+    
+    const unsubscribe = onSnapshot(
+      leadsCollectionRef,
+      (snapshot) => {
+        if (snapshot.empty) {
+          // Seed database once if completely empty
+          seedInitialLeadsToFirestore();
+          onUpdate(cachedLeads);
+          return;
+        }
+
+        const items: LeadItem[] = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data() as LeadItem;
+          if (data && data.id) {
+            items.push(data);
+          }
+        });
+
+        // Sort leads newest first
+        items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        cachedLeads = items;
+        saveLocalStorageLeads(items);
+        onUpdate(items);
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, leadsPath);
+        onUpdate(cachedLeads);
+      }
+    );
+
+    return unsubscribe;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, leadsPath);
+    onUpdate(cachedLeads);
+    return () => {};
+  }
+}
+
+async function seedInitialLeadsToFirestore() {
+  for (const lead of INITIAL_SEED_LEADS) {
+    try {
+      const docRef = doc(db, 'leads', lead.id);
+      await setDoc(docRef, lead);
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `leads/${lead.id}`);
+    }
+  }
+}
+
+export function getLeads(): LeadItem[] {
+  return cachedLeads;
+}
+
 export function saveLead(data: Omit<LeadItem, 'id' | 'createdAt' | 'status'> & { id?: string }): LeadItem {
-  const currentLeads = getLeads();
   const randomNum = Math.floor(1000 + Math.random() * 9000);
   const newLead: LeadItem = {
     ...data,
@@ -91,41 +198,43 @@ export function saveLead(data: Omit<LeadItem, 'id' | 'createdAt' | 'status'> & {
     status: 'new',
   };
 
-  const updated = [newLead, ...currentLeads];
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch (err) {
-      console.error('Failed to save lead:', err);
-    }
-  }
+  // Update local memory & storage instantly
+  cachedLeads = [newLead, ...cachedLeads.filter((l) => l.id !== newLead.id)];
+  saveLocalStorageLeads(cachedLeads);
+
+  // Persist directly to Firestore database for cross-device permanent availability
+  const docPath = `leads/${newLead.id}`;
+  setDoc(doc(db, 'leads', newLead.id), newLead).catch((err) => {
+    handleFirestoreError(err, OperationType.WRITE, docPath);
+  });
+
   return newLead;
 }
 
 export function updateLeadStatus(id: string, status: LeadItem['status']): LeadItem[] {
-  const currentLeads = getLeads();
-  const updated = currentLeads.map((item) => (item.id === id ? { ...item, status } : item));
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch (err) {
-      console.error('Failed to update lead status:', err);
-    }
-  }
-  return updated;
+  cachedLeads = cachedLeads.map((item) => (item.id === id ? { ...item, status } : item));
+  saveLocalStorageLeads(cachedLeads);
+
+  // Sync update to Firestore
+  const docPath = `leads/${id}`;
+  updateDoc(doc(db, 'leads', id), { status }).catch((err) => {
+    handleFirestoreError(err, OperationType.UPDATE, docPath);
+  });
+
+  return cachedLeads;
 }
 
 export function deleteLead(id: string): LeadItem[] {
-  const currentLeads = getLeads();
-  const updated = currentLeads.filter((item) => item.id !== id);
-  if (typeof window !== 'undefined') {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch (err) {
-      console.error('Failed to delete lead:', err);
-    }
-  }
-  return updated;
+  cachedLeads = cachedLeads.filter((item) => item.id !== id);
+  saveLocalStorageLeads(cachedLeads);
+
+  // Sync deletion to Firestore
+  const docPath = `leads/${id}`;
+  deleteDoc(doc(db, 'leads', id)).catch((err) => {
+    handleFirestoreError(err, OperationType.DELETE, docPath);
+  });
+
+  return cachedLeads;
 }
 
 export function exportLeadsToCSV(leads: LeadItem[]): void {

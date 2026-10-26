@@ -1,0 +1,88 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Enquiry RFP Lead",
+      "description": "An enquiry form submission or project RFP request submitted on the website",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "fullName": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "company": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "division": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "sector": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "projectScale": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "location": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "new",
+            "contacted",
+            "survey_scheduled",
+            "quote_sent",
+            "closed"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "id",
+        "createdAt",
+        "fullName",
+        "phone",
+        "email",
+        "division",
+        "sector",
+        "projectScale",
+        "location",
+        "status",
+        "source"
+      ]
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Collection of all enquiry form submissions and project RFPs"
+    }
+  }
+}

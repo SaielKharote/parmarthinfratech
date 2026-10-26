@@ -1,0 +1,50 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidLead(data) {
+      return data.keys().hasAll(['id', 'createdAt', 'fullName', 'phone', 'email', 'division', 'sector', 'projectScale', 'location', 'status', 'source'])
+        && data.keys().hasOnly(['id', 'createdAt', 'fullName', 'company', 'phone', 'email', 'division', 'sector', 'projectScale', 'location', 'notes', 'status', 'source'])
+        && data.id is string && data.id.size() <= 128
+        && data.createdAt is string && data.createdAt.size() <= 128
+        && data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 200
+        && (!('company' in data) || (data.company is string && data.company.size() <= 200))
+        && data.phone is string && data.phone.size() > 0 && data.phone.size() <= 50
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 200
+        && data.division is string && data.division.size() <= 200
+        && data.sector is string && data.sector.size() <= 200
+        && data.projectScale is string && data.projectScale.size() <= 200
+        && data.location is string && data.location.size() <= 200
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000))
+        && data.status in ['new', 'contacted', 'survey_scheduled', 'quote_sent', 'closed']
+        && data.source is string && data.source.size() <= 200;
+    }
+
+    // Leads collection: Enquiry forms submitted by users
+    match /leads/{leadId} {
+      allow read: if true;
+      allow create: if isValidId(leadId) && isValidLead(incoming());
+      allow update: if isValidId(leadId) && isValidLead(incoming());
+      allow delete: if isValidId(leadId);
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
