@@ -74,21 +74,22 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
       source: 'Website RFP Quote Form',
     });
 
-    // 2. Dispatch real-time email notification to saielkharote98@gmail.com
-    try {
-      const emailResult = await sendEmailNotification(newLead);
+    // 2. Immediately transition UI to success confirmation
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+    setEmailSentStatus('Logged into CRM database');
+
+    // 3. Dispatch email notification in background without blocking the UI
+    sendEmailNotification(newLead).then((emailResult) => {
       if (emailResult.success) {
         setEmailSentStatus('Email notification dispatched to Pune HQ');
       } else {
         setEmailSentStatus('Logged into CRM database (Email queue processing)');
       }
-    } catch (err) {
-      console.warn('Email dispatch catch:', err);
+    }).catch((err) => {
+      console.warn('Background email dispatch catch:', err);
       setEmailSentStatus('Logged into CRM database');
-    } finally {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    }
+    });
   };
 
   const handleReset = () => {

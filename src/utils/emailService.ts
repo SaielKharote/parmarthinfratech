@@ -40,7 +40,7 @@ export async function sendEmailNotification(lead: LeadItem): Promise<EmailSendRe
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 9000); // 9 sec timeout
+    const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5 sec fast timeout
 
     // Send completely separate independent requests for each recipient with zero CC
     const results = await Promise.allSettled(
