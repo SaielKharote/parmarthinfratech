@@ -9,7 +9,7 @@ export type BackgroundStyle = 'grid' | 'particles' | 'waves';
 export interface ProjectItem {
   id: string;
   name: string;
-  category: 'civil' | 'electrical' | 'solar' | 'ami' | 'water';
+  category: 'civil' | 'electrical' | 'solar' | 'ami' | 'water' | 'bess';
   client: string;
   costMillionINR: number;
   location: string;
@@ -52,4 +52,31 @@ export interface CalculationResult {
   co2ReductionTonsPerYear: number;
   paybackYears: number;
   roiPercentage: number;
+  tariffPerKWh: number;
+  specificYield: number;
+  landedGreenTariff?: number;
+}
+
+export interface BessCalculationInput {
+  peakLoadKW: number;
+  backupHours: number; // 1, 2, 4, 6
+  application: 'tod-peak-shaving' | 'solar-arbitrage' | 'dg-displacement' | 'critical-backup';
+  existingSolarKWp?: number;
+}
+
+export interface BessCalculationResult {
+  ratedPowerKW: number;
+  ratedPowerMW: number;
+  storageCapacityKWh: number;
+  storageCapacityMWh: number;
+  cRate: string;
+  batteryChemistry: string;
+  estimatedCapexINR: number;
+  estimatedMonthlySavingsINR: number;
+  estimatedAnnualSavingsINR: number;
+  paybackYears: number;
+  roiPercentage: number;
+  dieselDisplacedLitersPerYear?: number;
+  co2ReductionTonsPerYear: number;
+  keyAssumptions: string[];
 }

@@ -9,6 +9,15 @@ interface QuoteModalProps {
   onClose: () => void;
   initialDivision?: string;
   initialNotes?: string;
+  isBessStudy?: boolean;
+  initialBessData?: {
+    powerKW?: number;
+    capacityKWh?: number;
+    backupHours?: number;
+    application?: string;
+    existingSolarKWp?: number;
+    facilityPeakKW?: number;
+  };
   theme?: ThemeMode;
 }
 
@@ -17,11 +26,15 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
   onClose,
   initialDivision = 'Civil Infrastructure & Structural Works',
   initialNotes = '',
+  isBessStudy = false,
+  initialBessData,
   theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
 
-  const [division, setDivision] = useState(initialDivision);
+  const [division, setDivision] = useState(
+    isBessStudy ? 'Battery Energy Storage Systems (BESS)' : initialDivision
+  );
   const [sector, setSector] = useState('Industrial / C&I');
   const [projectScale, setProjectScale] = useState('₹10M to ₹50 Million (₹1 - ₹5 Cr)');
   const [location, setLocation] = useState('Pune & PCMC, Maharashtra');
@@ -31,6 +44,19 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
   const [email, setEmail] = useState('');
   const [notes, setNotes] = useState(initialNotes);
 
+  // Dedicated BESS Sizing States
+  const [isBessMode, setIsBessMode] = useState(
+    isBessStudy || initialDivision.toLowerCase().includes('bess') || initialDivision.toLowerCase().includes('battery')
+  );
+  const [bessPeakKW, setBessPeakKW] = useState<number>(initialBessData?.facilityPeakKW || initialBessData?.powerKW || 200);
+  const [bessDurationHours, setBessDurationHours] = useState<number>(initialBessData?.backupHours || 2);
+  const [bessPowerKW, setBessPowerKW] = useState<number>(initialBessData?.powerKW || 150);
+  const [bessCapacityKWh, setBessCapacityKWh] = useState<number>(initialBessData?.capacityKWh || 300);
+  const [existingSolarKWp, setExistingSolarKWp] = useState<number>(initialBessData?.existingSolarKWp || 100);
+  const [bessApplication, setBessApplication] = useState<string>(
+    initialBessData?.application || 'Time-of-Day (TOD) Peak Shaving & Demand Shaving'
+  );
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [referenceId, setReferenceId] = useState('');
@@ -38,13 +64,29 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
   const [emailSentStatus, setEmailSentStatus] = useState<string>('');
 
   useEffect(() => {
-    if (initialDivision) setDivision(initialDivision);
+    if (isBessStudy) {
+      setDivision('Battery Energy Storage Systems (BESS)');
+      setIsBessMode(true);
+    } else if (initialDivision) {
+      setDivision(initialDivision);
+      setIsBessMode(
+        initialDivision.toLowerCase().includes('bess') || initialDivision.toLowerCase().includes('battery')
+      );
+    }
     if (initialNotes) setNotes(initialNotes);
-  }, [initialDivision, initialNotes, isOpen]);
+    if (initialBessData) {
+      if (initialBessData.facilityPeakKW) setBessPeakKW(initialBessData.facilityPeakKW);
+      if (initialBessData.backupHours) setBessDurationHours(initialBessData.backupHours);
+      if (initialBessData.powerKW) setBessPowerKW(initialBessData.powerKW);
+      if (initialBessData.capacityKWh) setBessCapacityKWh(initialBessData.capacityKWh);
+      if (initialBessData.existingSolarKWp) setExistingSolarKWp(initialBessData.existingSolarKWp);
+      if (initialBessData.application) setBessApplication(initialBessData.application);
+    }
+  }, [initialDivision, initialNotes, isBessStudy, initialBessData, isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || !phone.trim() || !email.trim()) {
       setErrorMessage('Please fill in your name, contact phone, and email address.');
@@ -54,42 +96,58 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
     setIsSubmitting(true);
     setErrorMessage('');
 
-    // Generate unique reference ID
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const refCode = `PIPL-RFP-2026-${randomNum}`;
-    setReferenceId(refCode);
+    try {
+      // Generate unique reference ID
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      const prefix = isBessMode ? 'PIPL-BESS-2026' : 'PIPL-RFP-2026';
+      const refCode = `${prefix}-${randomNum}`;
+      setReferenceId(refCode);
 
-    // 1. Save lead into local CRM (zero lost data)
-    const newLead = saveLead({
-      id: refCode,
-      fullName: fullName.trim(),
-      company: company.trim() || undefined,
-      phone: phone.trim(),
-      email: email.trim(),
-      division,
-      sector,
-      projectScale,
-      location,
-      notes: notes.trim() || undefined,
-      source: 'Website RFP Quote Form',
-    });
-
-    // 2. Immediately transition UI to success confirmation
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setEmailSentStatus('Logged into CRM database');
-
-    // 3. Dispatch email notification in background without blocking the UI
-    sendEmailNotification(newLead).then((emailResult) => {
-      if (emailResult.success) {
-        setEmailSentStatus('Email notification dispatched to Pune HQ');
-      } else {
-        setEmailSentStatus('Logged into CRM database (Email queue processing)');
+      // Compile comprehensive notes including BESS technical sizing details if applicable
+      let compiledNotes = notes.trim();
+      if (isBessMode) {
+        const bessSummary = `[BESS FEASIBILITY SIZING] Peak Demand: ${bessPeakKW} kW | Target Backup: ${bessDurationHours} Hours | Sized Power: ${bessPowerKW} kW | Storage Capacity: ${bessCapacityKWh} kWh | Solar Capacity: ${existingSolarKWp} kWp | Primary Application: ${bessApplication}`;
+        compiledNotes = compiledNotes ? `${bessSummary}\nClient Notes: ${compiledNotes}` : bessSummary;
       }
-    }).catch((err) => {
-      console.warn('Background email dispatch catch:', err);
+
+      // 1. Save lead into local CRM and Cloud Firestore DB
+      const newLead = saveLead({
+        id: refCode,
+        fullName: fullName.trim(),
+        company: company.trim() || undefined,
+        phone: phone.trim(),
+        email: email.trim(),
+        division,
+        sector,
+        projectScale,
+        location,
+        notes: compiledNotes || undefined,
+        source: isBessMode ? 'BESS Feasibility Study Request' : 'Website RFP Quote Form',
+      });
+
+      // 2. Transition UI to success confirmation
+      setIsSubmitted(true);
       setEmailSentStatus('Logged into CRM database');
-    });
+
+      // 3. Dispatch email notification in background
+      sendEmailNotification(newLead)
+        .then((emailResult) => {
+          if (emailResult?.success) {
+            setEmailSentStatus('Email notification dispatched to Pune HQ');
+          } else {
+            setEmailSentStatus('Logged into CRM database (Email queue processing)');
+          }
+        })
+        .catch((err) => {
+          console.warn('Background email dispatch catch:', err);
+          setEmailSentStatus('Logged into CRM database');
+        });
+    } catch (err) {
+      console.error('Submission error:', err);
+      setIsSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -105,17 +163,21 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
   };
 
   const waLeadText = encodeURIComponent(
-    `*NEW PROJECT RFP - PIPL*\n` +
+    `*${isBessMode ? 'BESS FEASIBILITY STUDY REQUEST' : 'NEW PROJECT RFP'} - PIPL*\n` +
       `*Reference:* ${referenceId}\n` +
       `*Name:* ${fullName}\n` +
-      `*Company/Society:* ${company || 'Individual/Residential'}\n` +
+      `*Company/Facility:* ${company || 'Industrial / Commercial Client'}\n` +
       `*Phone:* ${phone}\n` +
       `*Email:* ${email}\n` +
       `*Division:* ${division}\n` +
-      `*Scale:* ${projectScale}\n` +
+      (isBessMode
+        ? `*BESS Power:* ${bessPowerKW} kW | *Storage Capacity:* ${bessCapacityKWh} kWh\n` +
+          `*Target Backup:* ${bessDurationHours} hrs | *Facility Peak:* ${bessPeakKW} kW\n` +
+          `*Solar Capacity:* ${existingSolarKWp} kWp | *Objective:* ${bessApplication}\n`
+        : `*Scale:* ${projectScale}\n`) +
       `*Location:* ${location}\n` +
       (notes ? `*Site Notes:* ${notes}\n` : '') +
-      `\nPlease review my project requirements.`
+      `\nPlease review my technical specifications.`
   );
 
   return (
@@ -137,10 +199,10 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
         <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-800">
           <div>
             <span className="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400">
-              EPC & Infrastructure Request
+              {isBessMode ? 'Clean Energy Storage Division' : 'EPC & Infrastructure Request'}
             </span>
             <h3 id="quote-modal-title" className="text-xl sm:text-2xl font-bold font-heading text-slate-100 mt-1">
-              Request Project Proposal (RFP)
+              {isBessMode ? 'Request a BESS Feasibility Study' : 'Request Project Proposal (RFP)'}
             </h3>
           </div>
           <button
@@ -223,9 +285,14 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
                 </label>
                 <select
                   value={division}
-                  onChange={(e) => setDivision(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDivision(val);
+                    setIsBessMode(val.toLowerCase().includes('bess') || val.toLowerCase().includes('battery'));
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                 >
+                  <option value="Battery Energy Storage Systems (BESS)">Battery Energy Storage Systems (BESS)</option>
                   <option value="Civil Infrastructure & Structural Works">Civil Infrastructure & Structural Works</option>
                   <option value="Roads, Bridges & Municipal Infrastructure">Roads, Bridges & Municipal Infrastructure</option>
                   <option value="Electrical Infrastructure & Substations">Electrical Infrastructure & Substations (33kV/11kV)</option>
@@ -247,50 +314,201 @@ export const QuoteModal: React.FC<QuoteModalProps> = ({
                   onChange={(e) => setSector(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                 >
-                  <option value="Government / Municipal">Government Department / Municipal (PCMC/PMC/PWD)</option>
                   <option value="Industrial / C&I">Industrial / Commercial (C&I / Factories)</option>
+                  <option value="Government / Municipal">Government Department / Municipal (PCMC/PMC/PWD)</option>
                   <option value="Infrastructure Developer">Infrastructure Developer / General Contractor</option>
                   <option value="Housing Society (CHS)">Cooperative Housing Society (CHS)</option>
                 </select>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Project Capacity / Scope
-                </label>
-                <select
-                  value={projectScale}
-                  onChange={(e) => setProjectScale(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
-                >
-                  <option value="Under ₹10 Million (< ₹1 Cr)">Under ₹10 Million (&lt; ₹1 Cr) / Fast-Track Scope</option>
-                  <option value="₹10M to ₹50 Million (₹1 - ₹5 Cr)">₹10M to ₹50 Million (₹1 - ₹5 Cr)</option>
-                  <option value="₹50M to ₹150 Million (₹5 - ₹15 Cr)">₹50M to ₹150 Million (₹5 - ₹15 Cr)</option>
-                  <option value="₹150 Million+ Landmark EPC">₹150 Million+ (&gt; ₹15 Cr) Landmark EPC</option>
-                  <option value="100 kW to 2 MW Solar Capacity">100 kW to 2 MW Solar / Renewable</option>
-                  <option value="Annual O&M / Maintenance Contract">Annual O&M / Maintenance Contract</option>
-                </select>
-              </div>
+            {/* If BESS is selected, show explicit technical sizing fields */}
+            {isBessMode ? (
+              <div className="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-cyan-900/40">
+                  <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
+                    ⚡ BESS Technical Sizing Details
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    Power (kW/MW) vs Storage (kWh/MWh)
+                  </span>
+                </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                      Facility Peak Demand / Connected Load (kW / kVA)
+                    </label>
+                    <input
+                      type="number"
+                      min={10}
+                      max={20000}
+                      value={bessPeakKW}
+                      onChange={(e) => {
+                        const val = Math.max(10, parseInt(e.target.value) || 10);
+                        setBessPeakKW(val);
+                        // Auto-propose power and capacity
+                        const pKW = Math.round(val * 0.7);
+                        setBessPowerKW(pKW);
+                        setBessCapacityKWh(Math.round(pKW * bessDurationHours));
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+                      placeholder="e.g. 500 kW"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                      Target Backup / Shaving Duration (Hours)
+                    </label>
+                    <select
+                      value={bessDurationHours}
+                      onChange={(e) => {
+                        const h = parseFloat(e.target.value) || 2;
+                        setBessDurationHours(h);
+                        setBessCapacityKWh(Math.round(bessPowerKW * h));
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+                    >
+                      <option value="1">1 Hour (1C - Rapid Peak Shaving)</option>
+                      <option value="2">2 Hours (0.5C - Standard Commercial / TOD)</option>
+                      <option value="4">4 Hours (0.25C - Extended Evening Discharge)</option>
+                      <option value="6">6 Hours (0.16C - Deep Industrial Backup)</option>
+                      <option value="8">8 Hours (Full Shift Microgrid)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                      Battery Power (kW)
+                    </label>
+                    <input
+                      type="number"
+                      min={10}
+                      value={bessPowerKW}
+                      onChange={(e) => {
+                        const p = parseInt(e.target.value) || 10;
+                        setBessPowerKW(p);
+                        setBessCapacityKWh(Math.round(p * bessDurationHours));
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-cyan-300 font-mono font-bold focus:outline-none focus:border-cyan-500"
+                    />
+                    <span className="text-[10px] text-slate-500 mt-0.5 block">
+                      = {(bessPowerKW / 1000).toFixed(2)} MW PCS Rating
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                      Energy Capacity (kWh)
+                    </label>
+                    <input
+                      type="number"
+                      min={20}
+                      value={bessCapacityKWh}
+                      onChange={(e) => setBessCapacityKWh(parseInt(e.target.value) || 20)}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-emerald-300 font-mono font-bold focus:outline-none focus:border-cyan-500"
+                    />
+                    <span className="text-[10px] text-slate-500 mt-0.5 block">
+                      = {(bessCapacityKWh / 1000).toFixed(2)} MWh LFP Storage
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                      Existing / Planned Solar
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={existingSolarKWp}
+                      onChange={(e) => setExistingSolarKWp(parseInt(e.target.value) || 0)}
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-amber-300 font-mono focus:outline-none focus:border-cyan-500"
+                      placeholder="e.g. 250 kWp"
+                    />
+                    <span className="text-[10px] text-slate-500 mt-0.5 block">
+                      kWp on site (0 if none)
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                    Primary Sizing Objective / Use Case
+                  </label>
+                  <select
+                    value={bessApplication}
+                    onChange={(e) => setBessApplication(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Time-of-Day (TOD) Peak Shaving & Demand Shaving">Time-of-Day (TOD) Peak Shaving & Demand Shaving</option>
+                    <option value="Solar-Plus-Storage Self-Consumption (Zero Export & Arbitrage)">Solar-Plus-Storage Self-Consumption (Zero Export & Arbitrage)</option>
+                    <option value="Diesel Generator Displacement (Clean DG Offset)">Diesel Generator Displacement (Clean DG Offset)</option>
+                    <option value="EV Fast Charging Buffer & Grid Demand Mitigation">EV Fast Charging Buffer & Grid Demand Mitigation</option>
+                    <option value="Islanded Critical Microgrid & Uninterruptible Backup">Islanded Critical Microgrid & Uninterruptible Backup</option>
+                  </select>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Project Capacity / Scope
+                  </label>
+                  <select
+                    value={projectScale}
+                    onChange={(e) => setProjectScale(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Under ₹10 Million (< ₹1 Cr)">Under ₹10 Million (&lt; ₹1 Cr) / Fast-Track Scope</option>
+                    <option value="₹10M to ₹50 Million (₹1 - ₹5 Cr)">₹10M to ₹50 Million (₹1 - ₹5 Cr)</option>
+                    <option value="₹50M to ₹150 Million (₹5 - ₹15 Cr)">₹50M to ₹150 Million (₹5 - ₹15 Cr)</option>
+                    <option value="₹150 Million+ Landmark EPC">₹150 Million+ (&gt; ₹15 Cr) Landmark EPC</option>
+                    <option value="100 kW to 2 MW Solar Capacity">100 kW to 2 MW Solar / Renewable</option>
+                    <option value="Annual O&M / Maintenance Contract">Annual O&M / Maintenance Contract</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                    Project Location
+                  </label>
+                  <select
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+                  >
+                    <option value="Pune & PCMC, Maharashtra">Pune & PCMC, Maharashtra</option>
+                    <option value="Mumbai & MMR Region">Mumbai & MMR Region</option>
+                    <option value="Chakan / Ranjangaon / Talegaon Industrial">Chakan / Ranjangaon / Talegaon Industrial</option>
+                    <option value="Rest of Maharashtra">Rest of Maharashtra</option>
+                    <option value="Other State in India">Other State in India</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {isBessMode && (
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Project Location
+                  Project / Facility Site Location
                 </label>
                 <select
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
                 >
-                  <option value="Pune & PCMC, Maharashtra">Pune & PCMC, Maharashtra</option>
-                  <option value="Mumbai & MMR Region">Mumbai & MMR Region</option>
-                  <option value="Chakan / Ranjangaon / Talegaon Industrial">Chakan / Ranjangaon / Talegaon Industrial</option>
+                  <option value="Chakan / Bhosari / Talegaon MIDC (Pune)">Chakan / Bhosari / Talegaon MIDC (Pune)</option>
+                  <option value="Ranjangaon / Sanaswadi Industrial Belt">Ranjangaon / Sanaswadi Industrial Belt</option>
+                  <option value="Mumbai, Thane & MMR Industrial Zone">Mumbai, Thane & MMR Industrial Zone</option>
+                  <option value="Aurangabad / Waluj / Shendra Industrial">Aurangabad / Waluj / Shendra Industrial</option>
                   <option value="Rest of Maharashtra">Rest of Maharashtra</option>
                   <option value="Other State in India">Other State in India</option>
                 </select>
               </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

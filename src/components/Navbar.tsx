@@ -18,7 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
         </a>
 
         {/* Zone 2: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-5 lg:gap-6 text-sm font-medium">
+        <nav className="hidden md:flex items-center gap-4 lg:gap-5 text-sm font-medium">
           <a
             href="#divisions"
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
@@ -30,6 +30,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
           >
             Key Services
+          </a>
+          <a
+            href="#bess"
+            className="text-cyan-400 hover:text-cyan-300 transition-colors whitespace-nowrap shrink-0 font-semibold flex items-center gap-1 hover:underline underline-offset-8"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+            <span>BESS Storage</span>
           </a>
           <a
             href="#projects"
@@ -47,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
             href="#calculator"
             className="text-slate-300 hover:text-cyan-400 transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-8"
           >
-            Solar Calculator
+            Energy Calculator
           </a>
           <a
             href="#instagram-feed"
@@ -107,6 +114,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
             className="block text-sm font-medium text-slate-300 hover:text-cyan-400 py-1"
           >
             Key Services (Civil, Roads, Electrical, AMI, Solar, O&M)
+          </a>
+          <a
+            href="#bess"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-sm font-bold text-cyan-400 hover:text-cyan-300 py-1 flex items-center justify-between"
+          >
+            <span>Battery Energy Storage Systems (BESS)</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">NEW</span>
           </a>
           <a
             href="#projects"

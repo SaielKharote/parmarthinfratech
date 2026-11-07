@@ -12,43 +12,62 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({ th
   const certifications = [
     {
       title: 'ISO 9001:2015 Quality Management',
-      authority: 'International Organization for Standardization',
-      desc: 'Certified for engineering quality assurance, rigorous documentation trails, and audit-ready project delivery.',
+      authority: 'Accredited Certification Board',
+      desc: 'Certified for engineering quality assurance, rigorous documentation trails, and audit-ready project delivery in Civil, Electrical & Solar EPC works.',
       badge: 'ISO 9001:2015',
     },
     {
-      title: 'Govt. Approved Electrical Contractor',
-      authority: 'Electrical Inspectorate, Industries, Energy & Labour Dept.',
-      desc: 'Licensed Grade-A Electrical Contractor authorized for high-voltage substations, distribution networks, and grid sync.',
+      title: 'Govt. Approved Grade-A Electrical License',
+      authority: 'Electrical Inspectorate, Industries, Energy & Labour Dept., Govt. of Maharashtra',
+      desc: 'Licensed Grade-A Electrical Contractor legally authorized for high-voltage (up to 33kV) substations, power transformers, and HT distribution.',
       badge: 'Grade-A Electrical',
     },
     {
       title: 'DPIIT #StartupIndia Recognized',
       authority: 'Ministry of Commerce & Industry, Govt. of India',
-      desc: 'Officially recognized under the flagship Startup India initiative for clean-tech infrastructure and smart energy innovations.',
+      desc: 'Recognized Clean-Tech & Infrastructure Enterprise under Certificate #DIPP162547 for smart energy management and sustainable engineering solutions.',
       badge: '#StartupIndia',
     },
     {
-      title: 'MNRE Approved EPC Partner',
-      authority: 'Ministry of New & Renewable Energy, Govt. of India',
-      desc: 'Vetted under MNRE standards for ALMM-listed solar installations, Kusum pumping, and PM Suryaghar deployment.',
-      badge: 'MNRE Vetted',
+      title: 'MNRE / DISCOM Compliant Standards',
+      authority: 'Ministry of New & Renewable Energy & MSEDCL Guidelines',
+      desc: 'Strict adherence to ALMM-listed solar module mandates, BIS-certified inverters, and DISCOM grid-interconnection safety standards.',
+      badge: 'MNRE & CEA Norms',
+    },
+  ];
+
+  const warrantiesAndSubsidies = [
+    {
+      heading: '25-Year Solar PV Performance Warranty',
+      desc: 'Tier-1 Mono PERC & TOPCon solar modules backed by manufacturer linear degradation warranties guaranteeing &ge;84.8% power output at Year 25.',
+    },
+    {
+      heading: '10-Year or 6,000-Cycle BESS Cell Warranty',
+      desc: 'Tier-1 LiFePO4 (LFP) prismatic battery cells warranted for 6,000 cycles to 70% capacity retention, with 5-year bi-directional PCS warranty.',
+    },
+    {
+      heading: 'PM Surya Ghar DBT Subsidy Compliance',
+      desc: 'Residential consumers receive up to ₹78,000 direct benefit transfer (DBT) credited directly by the National Portal. C&I projects leverage 40% Accelerated Depreciation (Section 32).',
+    },
+    {
+      heading: '1-Year Workmanship & DLP Guarantee',
+      desc: 'Comprehensive Defect Liability Period (DLP) covering all structural, cabling, and electromechanical works executed by PIPL engineers.',
     },
   ];
 
   const clients = [
-    { name: 'Adani Energy Solutions', role: 'Smart Metering & AMI' },
-    { name: 'Mahindra Solarize', role: 'Renewable Power Systems' },
-    { name: 'Larsen & Toubro (L&T)', role: 'Infrastructure Projects' },
-    { name: 'Ultech Energies', role: 'Solar Pumping PM KUSUM' },
+    { name: 'Adani Energy Solutions', role: 'Smart Metering Field Subcontractor' },
+    { name: 'Mahindra Solarize', role: 'Renewable EPC Partner' },
+    { name: 'Larsen & Toubro (L&T)', role: 'Infrastructure Project Works' },
+    { name: 'Ultech Energies', role: 'PM-KUSUM Solar Pumping Execution' },
     { name: 'Mahavitaran (MSEDCL)', role: 'Utility Grid Interconnection' },
-    { name: 'PCMC Municipal Corp', role: 'Administrative Headquarters' },
-    { name: 'PWD Maharashtra', role: 'State Infrastructure Works' },
-    { name: 'Ministry of Defence', role: 'Government Establishments' },
-    { name: 'MEDA Maharashtra', role: 'Renewable Energy Authority' },
-    { name: 'Finolex Cables', role: 'Industrial High-Load Solar' },
-    { name: 'Podar Education Network', role: 'Institutional Solar EPC' },
-    { name: 'The Academy School', role: 'Rooftop Clean Energy' },
+    { name: 'PCMC Municipal Corp', role: 'Civic Infrastructure Works' },
+    { name: 'PWD Maharashtra', role: 'State Highway Works' },
+    { name: 'Ministry of Defence', role: 'Institutional Projects' },
+    { name: 'MEDA Maharashtra', role: 'Clean Energy Project Frameworks' },
+    { name: 'Finolex Cables', role: 'Industrial Solar EPC Client' },
+    { name: 'Podar Education Network', role: 'Institutional Solar EPC Client' },
+    { name: 'The Academy School', role: 'Rooftop Clean Energy Client' },
   ];
 
   return (
@@ -121,6 +140,42 @@ export const CertificationsSection: React.FC<CertificationsSectionProps> = ({ th
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Documented Warranties & Legal Subsidy Framework */}
+        <div className="p-5 sm:p-7 rounded-3xl border border-slate-800 bg-slate-900/50 mb-12 sm:mb-16">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2 mb-6">
+            <div>
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-amber-400">
+                Transparency & Legal Commitments
+              </span>
+              <h3 className="text-lg sm:text-xl font-bold font-heading text-slate-100 mt-1">
+                Documented Warranties & Government Subsidy Norms
+              </h3>
+            </div>
+            <span className="text-[11px] font-mono text-slate-400 px-2.5 py-1 rounded-full bg-slate-950 border border-slate-800">
+              Vetted Contracting Standards
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {warrantiesAndSubsidies.map((item, idx) => (
+              <div key={idx} className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-200 mb-2">
+                    <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <span>{item.heading}</span>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+                <div className="pt-3 mt-3 border-t border-slate-800/60 text-[10px] text-slate-500 font-mono">
+                  Standard Contract Schedule
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Clientele Showcase */}

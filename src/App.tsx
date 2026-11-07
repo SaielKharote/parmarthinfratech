@@ -6,6 +6,8 @@ import { Hero } from './components/Hero';
 import { ProjectsSlider } from './components/ProjectsSlider';
 import { OrganizationSection } from './components/OrganizationSection';
 import { ServicesSection } from './components/ServicesSection';
+import { BessSection } from './components/BessSection';
+import { CaseStudiesSection } from './components/CaseStudiesSection';
 import { LazyModelViewer } from './components/ModelViewer3D/LazyModelViewer';
 import { HseSection } from './components/HseSection';
 import { InstagramSection } from './components/InstagramSection';
@@ -24,6 +26,15 @@ export default function App() {
   const [isQuoteOpen, setIsQuoteOpen] = useState(false);
   const [quoteDivision, setQuoteDivision] = useState('Civil Infrastructure & Structural Works');
   const [quoteNotes, setQuoteNotes] = useState('');
+  const [isBessStudyModal, setIsBessStudyModal] = useState(false);
+  const [bessInitialData, setBessInitialData] = useState<{
+    powerKW?: number;
+    capacityKWh?: number;
+    backupHours?: number;
+    application?: string;
+    existingSolarKWp?: number;
+    facilityPeakKW?: number;
+  } | undefined>(undefined);
 
   // Admin portal state
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -40,13 +51,33 @@ export default function App() {
     return () => window.removeEventListener('hashchange', checkHash);
   }, []);
 
-  const handleOpenQuoteModal = (division?: string) => {
-    if (division) setQuoteDivision(division);
+  const handleOpenQuoteModal = (division?: string, initialNotes?: string) => {
+    if (division) {
+      setQuoteDivision(division);
+      setIsBessStudyModal(division.toLowerCase().includes('bess') || division.toLowerCase().includes('battery'));
+    } else {
+      setIsBessStudyModal(false);
+    }
+    if (initialNotes) setQuoteNotes(initialNotes);
     setIsQuoteOpen(true);
   };
 
   const handleOpenQuoteWithDetails = (notes: string) => {
     setQuoteNotes(notes);
+    setIsQuoteOpen(true);
+  };
+
+  const handleOpenBessStudy = (data?: {
+    powerKW?: number;
+    capacityKWh?: number;
+    backupHours?: number;
+    application?: string;
+    existingSolarKWp?: number;
+    facilityPeakKW?: number;
+  }) => {
+    setQuoteDivision('Battery Energy Storage Systems (BESS)');
+    setIsBessStudyModal(true);
+    if (data) setBessInitialData(data);
     setIsQuoteOpen(true);
   };
 
@@ -77,12 +108,20 @@ export default function App() {
           }}
         />
 
+        {/* 1.8 Verified Project Case Studies (Scope, Location, PIPL Role, Verified Outcomes) */}
+        <div className="optimize-rendering">
+          <CaseStudiesSection
+            onOpenQuoteModal={handleOpenQuoteModal}
+            onOpenBessStudy={handleOpenBessStudy}
+          />
+        </div>
+
         {/* 2. Organization Structure & 3 Core Divisions (Civil, Electrical, Renewable) */}
         <div className="optimize-rendering">
           <OrganizationSection onOpenQuoteModal={handleOpenQuoteModal} />
         </div>
 
-        {/* 3. The 6 Key Services (Civil & Structural, Roads & Bridges, Electrical, Smart Metering, Solar, O&M) */}
+        {/* 3. The Key Services (BESS Storage, Civil & Structural, Roads & Bridges, Electrical, Smart Metering, Solar, O&M) */}
         <div className="optimize-rendering">
           <ServicesSection
             onSelectModel={(m) => {
@@ -91,6 +130,11 @@ export default function App() {
             }}
             onOpenQuoteModal={handleOpenQuoteModal}
           />
+        </div>
+
+        {/* 3.5 Dedicated Battery Energy Storage Systems (BESS) Division Section */}
+        <div className="optimize-rendering">
+          <BessSection onOpenFeasibilityStudy={handleOpenBessStudy} />
         </div>
 
         {/* 4. Interactive 3D Equipment & Substation Viewport */}
@@ -184,8 +228,11 @@ export default function App() {
 
         {/* 9. Dedicated Energy Solutions & Subsidy Sizing Module */}
         <div className="relative optimize-rendering">
-          {/* Energy Calculator */}
-          <EnergyCalculator onOpenQuoteWithDetails={handleOpenQuoteWithDetails} />
+          {/* Energy Calculator with Solar & BESS modes */}
+          <EnergyCalculator 
+            onOpenQuoteWithDetails={handleOpenQuoteWithDetails}
+            onOpenBessStudy={handleOpenBessStudy}
+          />
 
           {/* Maharashtra & National Solar Subsidy Framework */}
           <SubsidySection onOpenQuoteModal={handleOpenQuoteModal} />
@@ -198,12 +245,18 @@ export default function App() {
         onOpenAdminModal={() => setIsAdminOpen(true)}
       />
 
-      {/* Project RFP / EPC Quote Modal */}
+      {/* Project RFP / EPC / BESS Quote Modal */}
       <QuoteModal
         isOpen={isQuoteOpen}
-        onClose={() => setIsQuoteOpen(false)}
+        onClose={() => {
+          setIsQuoteOpen(false);
+          setIsBessStudyModal(false);
+          setBessInitialData(undefined);
+        }}
         initialDivision={quoteDivision}
         initialNotes={quoteNotes}
+        isBessStudy={isBessStudyModal}
+        initialBessData={bessInitialData}
       />
 
       {/* Executive Admin & Leads Dashboard Modal */}

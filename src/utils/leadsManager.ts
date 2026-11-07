@@ -202,11 +202,17 @@ export function saveLead(data: Omit<LeadItem, 'id' | 'createdAt' | 'status'> & {
   cachedLeads = [newLead, ...cachedLeads.filter((l) => l.id !== newLead.id)];
   saveLocalStorageLeads(cachedLeads);
 
-  // Persist directly to Firestore database for cross-device permanent availability
-  const docPath = `leads/${newLead.id}`;
-  setDoc(doc(db, 'leads', newLead.id), newLead).catch((err) => {
-    handleFirestoreError(err, OperationType.WRITE, docPath);
-  });
+  // Safely persist directly to Firestore database
+  try {
+    if (db) {
+      const docPath = `leads/${newLead.id}`;
+      setDoc(doc(db, 'leads', newLead.id), newLead).catch((err) => {
+        handleFirestoreError(err, OperationType.WRITE, docPath);
+      });
+    }
+  } catch (err) {
+    console.warn('Firestore setDoc catch:', err);
+  }
 
   return newLead;
 }
@@ -216,10 +222,16 @@ export function updateLeadStatus(id: string, status: LeadItem['status']): LeadIt
   saveLocalStorageLeads(cachedLeads);
 
   // Sync update to Firestore
-  const docPath = `leads/${id}`;
-  updateDoc(doc(db, 'leads', id), { status }).catch((err) => {
-    handleFirestoreError(err, OperationType.UPDATE, docPath);
-  });
+  try {
+    if (db) {
+      const docPath = `leads/${id}`;
+      updateDoc(doc(db, 'leads', id), { status }).catch((err) => {
+        handleFirestoreError(err, OperationType.UPDATE, docPath);
+      });
+    }
+  } catch (err) {
+    console.warn('Firestore updateDoc catch:', err);
+  }
 
   return cachedLeads;
 }
@@ -229,10 +241,16 @@ export function deleteLead(id: string): LeadItem[] {
   saveLocalStorageLeads(cachedLeads);
 
   // Sync deletion to Firestore
-  const docPath = `leads/${id}`;
-  deleteDoc(doc(db, 'leads', id)).catch((err) => {
-    handleFirestoreError(err, OperationType.DELETE, docPath);
-  });
+  try {
+    if (db) {
+      const docPath = `leads/${id}`;
+      deleteDoc(doc(db, 'leads', id)).catch((err) => {
+        handleFirestoreError(err, OperationType.DELETE, docPath);
+      });
+    }
+  } catch (err) {
+    console.warn('Firestore deleteDoc catch:', err);
+  }
 
   return cachedLeads;
 }
