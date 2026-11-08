@@ -14,25 +14,35 @@ import {
   Cpu
 } from 'lucide-react';
 import { ThemeMode } from '../types';
+import { InteractiveDiyaCelebration } from './Diwali/InteractiveDiyaCelebration';
 
 interface HeroProps {
   theme?: ThemeMode;
+  isDiwaliActive?: boolean;
   onSelectModel: (type: 'solar' | 'meter' | 'transformer' | 'ev') => void;
   onOpenQuoteModal: (division?: string) => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
+  isDiwaliActive = false,
   onSelectModel,
   onOpenQuoteModal,
 }) => {
   const [activeHeroTab, setActiveHeroTab] = useState<'office' | 'solar' | 'infra'>('office');
 
   return (
-    <section className="relative pt-6 pb-12 md:pt-14 md:pb-20 overflow-hidden">
+    <section className="relative pt-6 pb-12 md:pt-10 md:pb-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Interactive Diwali Diya & Sparkler Celebration (Auto-Active during Diwali week) */}
+        {isDiwaliActive && (
+          <div className="animate-fade-in">
+            <InteractiveDiyaCelebration />
+          </div>
+        )}
+
         {/* Top Trust & Accreditation Strip */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-slate-300 mb-5">
-          <span className="font-semibold text-cyan-400 flex items-center gap-1.5">
+          <span className={`font-semibold flex items-center gap-1.5 ${isDiwaliActive ? 'text-amber-400' : 'text-cyan-400'}`}>
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>Govt. Approved Electrical Contractor</span>
           </span>
@@ -51,9 +61,13 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Left Column: True Infrastructure Positioning */}
           <div className="lg:col-span-7">
             {/* Tagline Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-mono mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-              <span>Empowering Progress, Inspiring Purpose</span>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono mb-3 ${
+              isDiwaliActive
+                ? 'bg-amber-500/15 border border-amber-500/30 text-amber-300'
+                : 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isDiwaliActive ? 'bg-amber-400' : 'bg-cyan-400'} animate-pulse`} />
+              <span>{isDiwaliActive ? 'शुभ दीपावली · Empowering Progress, Inspiring Purpose' : 'Empowering Progress, Inspiring Purpose'}</span>
             </div>
 
             <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-heading text-slate-100 leading-[1.18]">

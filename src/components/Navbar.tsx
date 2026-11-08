@@ -4,17 +4,28 @@ import { Logo } from './Logo';
 
 interface NavbarProps {
   onOpenQuoteModal: () => void;
+  isDiwaliActive?: boolean;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenQuoteModal, isDiwaliActive = false }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b backdrop-blur-md bg-slate-950/90 border-slate-800 text-slate-100 shadow-sm">
+    <header className={`sticky top-0 z-40 w-full border-b backdrop-blur-md transition-colors ${
+      isDiwaliActive 
+        ? 'bg-slate-950/95 border-amber-500/30 text-slate-100 shadow-md shadow-amber-500/5' 
+        : 'bg-slate-950/90 border-slate-800 text-slate-100 shadow-sm'
+    }`}>
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-6">
         {/* Zone 1: Authentic Brand Logo */}
         <a href="#" className="flex items-center gap-2 sm:gap-3 whitespace-nowrap shrink-0 focus:outline-none">
           <Logo showText={true} />
+          {isDiwaliActive && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-mono hidden sm:inline-flex items-center gap-1">
+              <span>🪔</span>
+              <span className="text-[10px] font-bold">Festive</span>
+            </span>
+          )}
         </a>
 
         {/* Zone 2: Navigation Links */}

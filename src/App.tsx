@@ -18,8 +18,11 @@ import { Footer } from './components/Footer';
 import { QuoteModal } from './components/QuoteModal';
 import { AdminModal } from './components/AdminModal';
 import { Box } from 'lucide-react';
+import { isDiwaliThemeActive } from './utils/diwaliTheme';
+import { DiwaliFestiveRibbon } from './components/Diwali/DiwaliFestiveRibbon';
 
 export default function App() {
+  const isDiwaliActive = isDiwaliThemeActive();
   const [selected3DModel, setSelected3DModel] = useState<'solar' | 'meter' | 'transformer' | 'ev'>('transformer');
 
   // Quote modal state
@@ -82,20 +85,28 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen font-sans bg-slate-950 text-slate-100 antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className={`min-h-screen font-sans bg-slate-950 text-slate-100 antialiased ${
+      isDiwaliActive 
+        ? 'selection:bg-amber-500/30 selection:text-amber-200' 
+        : 'selection:bg-cyan-500/30 selection:text-cyan-200'
+    }`}>
       {/* Sleek, simple, slow-motion dynamic wallpaper background */}
-      <LiveBackground />
+      <LiveBackground isDiwaliActive={isDiwaliActive} />
+
+      {/* Diwali Festive Announcement Ribbon (Auto-active during Diwali week) */}
+      {isDiwaliActive && <DiwaliFestiveRibbon />}
 
       {/* Topmost Slim Clientele & Strategic Partners Strip (Above Header) */}
       <ClienteleTicker />
 
       {/* Top Bar Navigation */}
-      <Navbar onOpenQuoteModal={() => handleOpenQuoteModal()} />
+      <Navbar onOpenQuoteModal={() => handleOpenQuoteModal()} isDiwaliActive={isDiwaliActive} />
 
       {/* Main Content Sections */}
       <main>
         {/* 1. Integrated Infrastructure Hero Section */}
         <Hero
+          isDiwaliActive={isDiwaliActive}
           onSelectModel={setSelected3DModel}
           onOpenQuoteModal={handleOpenQuoteModal}
         />

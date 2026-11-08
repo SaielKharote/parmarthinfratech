@@ -5,7 +5,11 @@ import React, { useEffect, useRef } from 'react';
  * Sleek, simple, and slow-motion ambient background for the complete screen.
  * Optimized for mobile devices with lightweight particle rendering and zero layout thrashing.
  */
-export const LiveBackground: React.FC = () => {
+interface LiveBackgroundProps {
+  isDiwaliActive?: boolean;
+}
+
+export const LiveBackground: React.FC<LiveBackgroundProps> = ({ isDiwaliActive = false }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -26,8 +30,8 @@ export const LiveBackground: React.FC = () => {
     };
     window.addEventListener('resize', handleResize, { passive: true });
 
-    // Modest particle count (fewer on mobile for 60fps responsiveness)
-    const particleCount = isMobileDevice ? 14 : 32;
+    // Particle count
+    const particleCount = isMobileDevice ? (isDiwaliActive ? 22 : 14) : (isDiwaliActive ? 48 : 32);
     const particles: Array<{
       x: number;
       y: number;
@@ -39,21 +43,29 @@ export const LiveBackground: React.FC = () => {
       color: string;
     }> = [];
 
-    const colors = [
-      'rgba(6, 182, 212, ',   // Clean Cyan
-      'rgba(245, 158, 11, ',  // Solar Amber
-      'rgba(16, 185, 129, ',  // Clean Emerald
-      'rgba(56, 189, 248, ',  // Sky Blue
-    ];
+    const colors = isDiwaliActive
+      ? [
+          'rgba(245, 158, 11, ',  // Festive Amber Gold
+          'rgba(252, 211, 77, ',  // Bright Sparkler Gold
+          'rgba(249, 115, 22, ',  // Warm Deepavali Saffron
+          'rgba(234, 88, 12, ',   // Glowing Terracotta
+          'rgba(254, 240, 138, ', // White-gold shimmer
+        ]
+      : [
+          'rgba(6, 182, 212, ',   // Clean Cyan
+          'rgba(245, 158, 11, ',  // Solar Amber
+          'rgba(16, 185, 129, ',  // Clean Emerald
+          'rgba(56, 189, 248, ',  // Sky Blue
+        ];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 1.8 + 1,
-        vx: (Math.random() - 0.5) * 0.1,
-        vy: -Math.random() * 0.18 - 0.05, 
-        alpha: Math.random() * 0.3 + 0.1,
+        size: isDiwaliActive ? Math.random() * 2.4 + 1 : Math.random() * 1.8 + 1,
+        vx: (Math.random() - 0.5) * (isDiwaliActive ? 0.15 : 0.1),
+        vy: -Math.random() * (isDiwaliActive ? 0.28 : 0.18) - 0.05, 
+        alpha: Math.random() * 0.35 + 0.1,
         alphaSpeed: (Math.random() * 0.003 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
         color: colors[Math.floor(Math.random() * colors.length)],
       });
