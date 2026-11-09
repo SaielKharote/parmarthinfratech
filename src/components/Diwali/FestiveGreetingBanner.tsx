@@ -7,7 +7,7 @@ interface FestiveGreetingBannerProps {
 
 export const FestiveGreetingBanner: React.FC<FestiveGreetingBannerProps> = ({ onOpenQuoteModal }) => {
   return (
-    <div className="relative overflow-hidden rounded-3xl p-5 sm:p-7 md:p-8 border border-amber-500/35 bg-gradient-to-br from-amber-950/40 via-slate-950 to-orange-950/30 backdrop-blur-md shadow-2xl shadow-amber-500/5 mb-8 sm:mb-10 transition-all">
+    <div className="relative overflow-hidden rounded-3xl p-4 sm:p-6 md:p-8 border border-amber-500/35 bg-gradient-to-br from-amber-950/40 via-slate-950 to-orange-950/30 backdrop-blur-md shadow-2xl shadow-amber-500/5 mb-8 sm:mb-10 transition-all">
       {/* 1. Indian Geometric Jaali (Lattice) Background Watermark */}
       <div 
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
@@ -58,21 +58,21 @@ export const FestiveGreetingBanner: React.FC<FestiveGreetingBannerProps> = ({ on
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-75" />
 
       {/* Main Content Layout */}
-      <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
+      <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-8">
         <div className="max-w-3xl space-y-3">
-          {/* Auspicious Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-mono font-semibold">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-spin" style={{ animationDuration: '8s' }} />
-            <span>शुभ दीपावली · Shubh Deepavali Greetings</span>
-            <span className="text-amber-400/80">·</span>
-            <span className="text-amber-200">Festival of Lights</span>
+          {/* Auspicious Badge - Clean, Non-wrapping, Greetings removed */}
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] sm:text-xs font-mono font-semibold max-w-full">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="whitespace-nowrap">शुभ दीपावली · Shubh Deepavali</span>
+            </div>
           </div>
 
-          {/* Heading with Elegant Diya Motif */}
-          <div className="flex items-start sm:items-center gap-3">
+          {/* Heading with Perfectly Aligned Diya Motif */}
+          <div className="flex items-start gap-3 sm:gap-3.5">
             {/* Traditional Brass Diya Vector Motif */}
-            <div className="shrink-0 p-2 sm:p-2.5 rounded-2xl bg-amber-950/60 border border-amber-500/40 shadow-inner shadow-amber-500/20">
-              <svg width="34" height="34" viewBox="0 0 48 48" fill="none" className="text-amber-400">
+            <div className="shrink-0 p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-amber-950/60 border border-amber-500/40 shadow-inner shadow-amber-500/20 mt-0.5 sm:mt-1">
+              <svg width="28" height="28" viewBox="0 0 48 48" fill="none" className="text-amber-400 sm:w-8 sm:h-8">
                 {/* Flame with Soft Glow */}
                 <path
                   d="M24 4 C24 4 31 14 31 23 C31 29 27.5 32 24 32 C20.5 32 17 29 17 23 C17 14 24 4 24 4 Z"
@@ -102,11 +102,11 @@ export const FestiveGreetingBanner: React.FC<FestiveGreetingBannerProps> = ({ on
               </svg>
             </div>
 
-            <div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold font-heading text-slate-100 tracking-tight">
+            <div className="space-y-1">
+              <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold font-heading text-slate-100 tracking-tight leading-snug">
                 Illuminating Progress with Sustainable Clean Energy
               </h2>
-              <div className="text-xs sm:text-sm font-medium text-amber-300/90 font-heading mt-0.5">
+              <div className="text-xs sm:text-sm font-medium text-amber-300/90 font-heading">
                 Parmaarth Infratech Pvt. Ltd. wishes our clients & partners a prosperous Deepavali
               </div>
             </div>
@@ -118,16 +118,16 @@ export const FestiveGreetingBanner: React.FC<FestiveGreetingBannerProps> = ({ on
           </p>
 
           {/* Executive Pillars / Commitments */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 text-xs text-slate-300">
-            <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-amber-500/20">
-              <SunMedium className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 pt-1 text-xs text-slate-300">
+            <div className="flex items-start sm:items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-amber-500/20">
+              <SunMedium className="w-4 h-4 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
+              <span className="leading-snug">
                 <strong className="text-amber-200">Festive Feasibility Study:</strong> Fast-track technical sizing for BESS & Solar EPC.
               </span>
             </div>
-            <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-amber-500/20">
-              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>
+            <div className="flex items-start sm:items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 border border-amber-500/20">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 sm:mt-0" />
+              <span className="leading-snug">
                 <strong className="text-emerald-200">Zero-Harm Safety Rigor:</strong> 100% HSE protocol compliance on all active project sites.
               </span>
             </div>
@@ -135,7 +135,7 @@ export const FestiveGreetingBanner: React.FC<FestiveGreetingBannerProps> = ({ on
         </div>
 
         {/* Right Action / CTA Cluster */}
-        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-center gap-3 shrink-0 pt-2 lg:pt-0">
+        <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-center gap-2.5 sm:gap-3 shrink-0 pt-1 lg:pt-0">
           <button
             onClick={() => {
               if (onOpenQuoteModal) {
@@ -144,7 +144,7 @@ export const FestiveGreetingBanner: React.FC<FestiveGreetingBannerProps> = ({ on
                 document.getElementById('bess')?.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 group whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 group whitespace-nowrap cursor-pointer"
           >
             <span>Request Festive RFP / Feasibility Study</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -152,7 +152,7 @@ export const FestiveGreetingBanner: React.FC<FestiveGreetingBannerProps> = ({ on
 
           <a
             href="#calculator"
-            className="text-xs text-amber-300 hover:text-white transition-colors underline-offset-4 hover:underline text-center sm:text-right font-medium"
+            className="text-xs text-amber-300 hover:text-white transition-colors underline-offset-4 hover:underline text-center sm:text-right font-medium py-1"
           >
             Calculate Solar & BESS ROI &rarr;
           </a>

@@ -176,7 +176,7 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="flex items-center gap-2">
               <span className="text-base animate-pulse">🪔</span>
               <span className="font-heading font-semibold text-amber-200">
-                शुभ दीपावली · Shubh Deepavali Greetings from Parmaarth Infratech Pvt. Ltd.
+                शुभ दीपावली · Shubh Deepavali · Parmaarth Infratech Pvt. Ltd.
               </span>
             </div>
             <span className="text-[11px] text-amber-300/70 font-mono">
