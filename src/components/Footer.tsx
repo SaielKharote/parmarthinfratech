@@ -7,9 +7,14 @@ interface FooterProps {
   theme?: ThemeMode;
   onOpenQuoteModal: () => void;
   onOpenAdminModal?: () => void;
+  isDiwaliActive?: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal, onOpenAdminModal }) => {
+export const Footer: React.FC<FooterProps> = ({ 
+  onOpenQuoteModal, 
+  onOpenAdminModal,
+  isDiwaliActive = false,
+}) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -164,6 +169,21 @@ export const Footer: React.FC<FooterProps> = ({ onOpenQuoteModal, onOpenAdminMod
             </div>
           </div>
         </div>
+
+        {/* Festive Diwali Corporate Greeting when active */}
+        {isDiwaliActive && (
+          <div className="mt-8 pt-6 border-t border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-amber-300/80 bg-amber-950/20 px-4 py-3 rounded-2xl border border-amber-500/30">
+            <div className="flex items-center gap-2">
+              <span className="text-base animate-pulse">🪔</span>
+              <span className="font-heading font-semibold text-amber-200">
+                शुभ दीपावली · Shubh Deepavali Greetings from Parmaarth Infratech Pvt. Ltd.
+              </span>
+            </div>
+            <span className="text-[11px] text-amber-300/70 font-mono">
+              Illuminating India with Resilient EPC, Smart Grids & Clean Solar Energy
+            </span>
+          </div>
+        )}
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-center sm:text-left">

@@ -254,6 +254,7 @@ export default function App() {
       <Footer
         onOpenQuoteModal={() => handleOpenQuoteModal()}
         onOpenAdminModal={() => setIsAdminOpen(true)}
+        isDiwaliActive={isDiwaliActive}
       />
 
       {/* Project RFP / EPC / BESS Quote Modal */}

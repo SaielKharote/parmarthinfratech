@@ -14,7 +14,7 @@ import {
   Cpu
 } from 'lucide-react';
 import { ThemeMode } from '../types';
-import { InteractiveDiyaCelebration } from './Diwali/InteractiveDiyaCelebration';
+import { FestiveGreetingBanner } from './Diwali/FestiveGreetingBanner';
 
 interface HeroProps {
   theme?: ThemeMode;
@@ -33,10 +33,10 @@ export const Hero: React.FC<HeroProps> = ({
   return (
     <section className="relative pt-6 pb-12 md:pt-10 md:pb-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Interactive Diwali Diya & Sparkler Celebration (Auto-Active during Diwali week) */}
+        {/* Professional Festive Greeting Banner with Traditional Motifs (Auto-Active during Diwali week) */}
         {isDiwaliActive && (
           <div className="animate-fade-in">
-            <InteractiveDiyaCelebration />
+            <FestiveGreetingBanner onOpenQuoteModal={onOpenQuoteModal} />
           </div>
         )}
 
